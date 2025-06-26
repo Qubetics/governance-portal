@@ -156,7 +156,7 @@ function CreateProposal() {
             proposer: key.bech32Address,
           }).finish(),
         };
-        
+
         const gasUsed = await simulateMsgs(
           CHAIN_INFO,
           key.bech32Address,
@@ -207,14 +207,14 @@ function CreateProposal() {
 
   function connectWallet() {
     console.log("isWallet : ", isWallet);
-    
+
     if (isWallet) {
       const getKeyFromKeplr = async () => {
         try {
           const win: any = window;
           const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
           console.log("key : ", key);
-          
+
           if (key) {
             setWalletAddress(key.bech32Address);
             toast.success("Successfully connected with Keplr wallet.");
@@ -356,7 +356,7 @@ function CreateProposal() {
               </div>
             </div>
             {!walletAddress && (
-              <button className="connectWallet" onClick={handleKeplrModal}>
+              <button className=" commonBtn" onClick={handleKeplrModal}>
                 Connect Wallet
               </button>
             )}
@@ -432,8 +432,8 @@ function CreateProposal() {
               </div>
               <CreateProposalCard data={data} />
               <div className="createProposalMultiBtn">
-                {/* <button className="cmnBtn">Preview</button> */}
-                <button className="cmnBtn" onClick={handleCreateProposal}>
+                {/* <button className="commonBtn">Preview</button> */}
+                <button className="commonBtn" onClick={handleCreateProposal}>
                   Create Proposal
                 </button>
               </div>

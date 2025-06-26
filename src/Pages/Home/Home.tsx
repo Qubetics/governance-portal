@@ -267,7 +267,7 @@ function Home() {
           <div className="container">
             <div className="createProposalBtn">
               <button
-                className="cmnBtn"
+                className="commonBtn"
                 onClick={() => navigate(Path.CREATEPROPOSAL)}
               >
                 Create Proposal

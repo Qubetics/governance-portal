@@ -30,17 +30,6 @@
         align-items: center;
         gap: 5px;
       }
-
-      .connectWallet {
-        color: var(--blueB3C8E6);
-        font-size: 12px;
-        background-color: #0068ff33;
-        border: 1px solid var(--brandPurple);
-        border-radius: 10px;
-        padding: 5px 9px;
-        cursor: pointer;
-        font-weight: 600;
-      }
     }
 
     .quorumSec {
@@ -162,9 +151,8 @@
     }
 
     .pink {
-      color: #ed5a8d
+      color: #ed5a8d;
     }
-
   }
 }
 
@@ -191,10 +179,12 @@
     }
 
     button {
-      background: linear-gradient(88.08deg,
-          rgba(1, 124, 201, 0.154) 3.13%,
-          rgba(8, 147, 234, 0.35) 48.43%,
-          rgba(1, 138, 224, 0.173509) 98.38%);
+      background: linear-gradient(
+        88.08deg,
+        rgba(1, 124, 201, 0.154) 3.13%,
+        rgba(8, 147, 234, 0.35) 48.43%,
+        rgba(1, 138, 224, 0.173509) 98.38%
+      );
       padding: 9px;
       display: flex;
       gap: 7px;
@@ -479,7 +469,7 @@
 }
 
 .pinkBorder {
-  border: 1px solid  #ed5a8d !important;
+  border: 1px solid #ed5a8d !important;
 }
 
 .greenBorder {

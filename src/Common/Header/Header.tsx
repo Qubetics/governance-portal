@@ -1,6 +1,6 @@
 import "./Header.scss";
 import { useEffect, useState } from "react";
-import { Logo } from "../assets/StoreAsset/StoreAsset";
+import logo  from "../../logo.svg";
 import { useNavigate } from 'react-router-dom';
 
 function Header() {
@@ -27,7 +27,7 @@ function Header() {
         <div className="header-main_inner">
           <div className="header-main_inner__left">
             <div className="svgLogo" onClick={(() => { navigate("/") })}>
-              <Logo />
+              <img src={logo} alt="" />
               <h3> {process.env.REACT_APP_PROJECT_NAME ?? ""} - Governance Proposal</h3>
             </div>
           </div>

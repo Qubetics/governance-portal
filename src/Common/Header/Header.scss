@@ -3,6 +3,7 @@
   z-index: 99;
   width: 100%;
   transition: 0.3s all;
+  background: #121212;
 
   &_inner {
     display: flex;
@@ -19,13 +20,12 @@
         gap: 18px;
       }
 
-     
       .svgLogo {
         display: flex;
         align-items: center;
         font-size: 20px;
         gap: 20px;
-        h3{
+        h3 {
           color: var(--white);
           font-size: var(--headingFour);
         }
@@ -40,21 +40,14 @@
       }
     }
 
-
     &__right {
       display: flex;
       gap: 20px;
-
-
-
-      
-
-     
     }
   }
 }
 .sticky {
-    top: 0;
-    z-index: 99;
-    background-color: var(--black);
-  }
+  top: 0;
+  z-index: 99;
+  background-color: #121212;
+}

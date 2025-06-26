@@ -570,7 +570,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
             </div>
           </div>
           <div className="voterBtn">
-            <button className="cmnBtn" onClick={showModal}>
+            <button className="commonBtn" onClick={showModal}>
               Show Recent Voters
             </button>
           </div>

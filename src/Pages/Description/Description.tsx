@@ -302,14 +302,14 @@ function Description() {
                 {propData?.status === "voting" ? (
                   walletAddress ? (
                     <button
-                      className="connectWallet"
+                      className="commonBtn"
                       onClick={handleVotingModal}
                     >
                       Vote
                     </button>
                   ) : (
                     <button
-                      className="connectWallet"
+                      className="commonBtn"
                       onClick={handleKeplrModal}
                     >
                       Connect Wallet

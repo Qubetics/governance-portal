@@ -1,6 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
 
 :root {
+  --bg-background: #111827;
+  --clr-card: rgb(168, 219, 215);
+  --clr-1: rgb(121, 255, 247);
+  --clr-2: rgb(255, 200, 118);
+  --clr-4: #91baf8;
+  --clr-3: rgb(106, 168, 209) 0deg;
+  --clr-5: rgb(255, 152, 226) 120deg;
+  --clr-6: rgb(247, 186, 229);
+}
+
+:root {
+  --theme-gradients-main: conic-gradient(
+      from 180deg,
+      rgb(255, 152, 226),
+      rgb(255, 200, 118) 35.77deg,
+      rgb(121, 255, 247) 153.75deg,
+      rgb(159, 83, 255) 258.75deg,
+      rgb(255, 152, 226) 360deg
+    ),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+  --searchBg: linear-gradient(
+    157.79deg,
+    rgba(29, 29, 29, 0.54) -0.65%,
+    rgba(29, 29, 29, 0.9) 99.59%
+  );
+}
+:root {
   margin: 0;
 
   // Color vars//
@@ -8,13 +35,12 @@
   --brandPurple: #348cf5;
   --bluetext: #00a6ff;
   --gradientBG: linear-gradient(
-    88.08deg,
-    rgba(255, 255, 255, 0) 1.62%,
-    rgba(255, 255, 255, 0.103237) 48.43%,
-    rgba(255, 255, 255, 0) 98.38%
+    157.79deg,
+    rgba(29, 29, 29, 0.54) -0.65%,
+    rgba(29, 29, 29, 0.9) 99.59%
   );
   --blue0086FF: #0086ff;
-  --bordeColor: #2e3842;
+  --bordeColor: rgba(255, 255, 255, 0.1490196078);
   --white: #fff;
   --black: #000;
   --blue21252c: #21252c;
@@ -384,22 +410,72 @@ html {
 // cmnTab End css -----------
 
 // Cmn Btn--------
+.commonBtn {
+  white-space: nowrap;
 
-.cmnBtn {
-  background: linear-gradient(95.53deg, #0068ff -1.41%, #00a7ff 100.25%);
-  border: 0;
-  border-radius: 16px;
-  height: 50px;
-  padding: 0 18px;
+  @media (max-width: 1199px) {
+    display: flex !important;
+    justify-content: center;
+    height: 50px;
+  }
+
+  position: relative;
+  display: inline-block;
+  padding: 12.5px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #000;
+  text-decoration: none;
+  border: none;
+  border-radius: 30px;
+  overflow: hidden;
   cursor: pointer;
-  font-size: var(--largeParaGraph16);
-  color: var(--white);
-  &:hover {
-    opacity: 0.7;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 30px;
+    background: conic-gradient(
+      from var(--gradient-angle),
+      var(--clr-card),
+      var(--clr-1),
+      var(--clr-2),
+      var(--clr-3),
+      var(--clr-4),
+      var(--clr-5),
+      var(--clr-6),
+      var(--clr-2),
+      var(--clr-1),
+      var(--clr-card)
+    );
+    animation: rotate 2.5s linear infinite;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: rotate 3s linear infinite;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
   }
 }
 
-// cmnBtn end css-------
+@keyframes rotate {
+  0% {
+    --gradient-angle: 0deg;
+  }
+
+  100% {
+    --gradient-angle: 360deg;
+  }
+}
+
+// commonBtn end css-------
 
 // Modal css----
 .cmnModal {

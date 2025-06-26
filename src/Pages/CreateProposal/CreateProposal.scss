@@ -39,16 +39,7 @@
         }
       }
     }
-    .connectWallet {
-      color: var(--blueB3C8E6);
-      font-size: 12px;
-      background-color: #0068ff33;
-      border: 1px solid var(--brandPurple);
-      border-radius: 10px;
-      padding: 5px 9px;
-      cursor: pointer;
-      font-weight: 600;
-    }
+   
   }
   .createContents {
     background: var(--gradientBG);
@@ -144,7 +135,7 @@
       width: 100%;
       margin-top: 50px;
       justify-content: center;
-      .cmnBtn {
+      .commonBtn {
         width: 100%;
         max-width: 440px;
       }

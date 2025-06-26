@@ -136,7 +136,7 @@ function SelectModal(props: any) {
         <CustomInput id="lname" name="lastname" placeholder="Enter memo" />
       </div> */}
       <div className="selectOptionModal_voteBtn">
-        <button className="cmnBtn" onClick={handleVote}>Vote</button>
+        <button className="commonBtn" onClick={handleVote}>Vote</button>
       </div>
     </div>
   );

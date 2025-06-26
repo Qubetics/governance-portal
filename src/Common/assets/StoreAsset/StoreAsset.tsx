@@ -1,115 +1,29 @@
 export const Logo = () => {
   return (
     <svg
-      width="68"
-      height="77"
-      viewBox="0 0 68 77"
+      width="36"
+      height="36"
+      viewBox="0 0 36 36"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g id="SHIDO - Logo + Text 1">
-        <g id="Group">
-          <g id="Group_2">
-            <path
-              id="Vector"
-              d="M3.20312 38.5871L14.8416 45.3011V50.4634L33.992 61.5059L53.1788 50.4634V45.1198L64.81 38.4639V57.0541L33.992 74.8105L3.20312 57.0686V38.5871Z"
-              fill="url(#paint0_linear_159_17)"
-            />
-            <path
-              id="Vector_2"
-              d="M14.8466 39.6963L3.22266 32.9969L3.23719 21.5339L23.4556 9.93311C23.4556 9.93311 22.1333 16.3208 28.5483 20.4535L14.8539 28.3566L14.8466 39.6963Z"
-              fill="url(#paint1_linear_159_17)"
-            />
-            <path
-              id="Vector_3"
-              d="M39.3809 20.4609C39.3809 20.4609 45.4762 17.3214 44.4881 9.94043L64.7792 21.6282L64.7646 33.0332L53.177 39.6601L53.1625 28.4001L39.3809 20.4609Z"
-              fill="url(#paint2_linear_159_17)"
-            />
-            <path
-              id="Vector_4"
-              d="M33.9194 43.1841L27.8168 46.6644L17.6895 40.8277V33.7803L33.9194 43.1841Z"
-              fill="url(#paint3_linear_159_17)"
-            />
-            <path
-              id="Vector_5"
-              d="M34.0566 43.1768L40.1519 46.657L50.2793 40.8204V33.7729L34.0566 43.1768Z"
-              fill="url(#paint4_linear_159_17)"
-            />
-            <path
-              id="Vector_6"
-              d="M33.9779 20.4102C38.9773 20.4102 43.0301 16.3493 43.0301 11.3399C43.0301 6.33046 38.9773 2.26953 33.9779 2.26953C28.9786 2.26953 24.9258 6.33046 24.9258 11.3399C24.9258 16.3493 28.9786 20.4102 33.9779 20.4102Z"
-              fill="url(#paint5_linear_159_17)"
-            />
-          </g>
-        </g>
-      </g>
+      <rect width="36" height="36" fill="url(#pattern0_2263_18725)" />
       <defs>
-        <linearGradient
-          id="paint0_linear_159_17"
-          x1="32.7974"
-          y1="-4.6595"
-          x2="34.4217"
-          y2="66.1368"
-          gradientUnits="userSpaceOnUse"
+        <pattern
+          id="pattern0_2263_18725"
+          patternContentUnits="objectBoundingBox"
+          width="1"
+          height="1"
         >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
-        <linearGradient
-          id="paint1_linear_159_17"
-          x1="15.1738"
-          y1="-4.25538"
-          x2="16.798"
-          y2="66.5409"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
-        <linearGradient
-          id="paint2_linear_159_17"
-          x1="51.4797"
-          y1="-5.08824"
-          x2="53.104"
-          y2="65.708"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
-        <linearGradient
-          id="paint3_linear_159_17"
-          x1="24.7325"
-          y1="-4.47425"
-          x2="26.3567"
-          y2="66.322"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
-        <linearGradient
-          id="paint4_linear_159_17"
-          x1="41.1718"
-          y1="-4.85152"
-          x2="42.796"
-          y2="65.9447"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
-        <linearGradient
-          id="paint5_linear_159_17"
-          x1="33.6096"
-          y1="-4.67811"
-          x2="35.2338"
-          y2="66.1181"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop stopColor="#00A6FF" />
-          <stop offset="1" stopColor="#0068FF" />
-        </linearGradient>
+          <use
+            transform="translate(0 0.0310345) scale(0.0117241)"
+          />
+        </pattern>
+        <image
+          id="image0_2263_18725"
+          width="232"
+          height="80"
+        />
       </defs>
     </svg>
   );
