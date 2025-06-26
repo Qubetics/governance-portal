@@ -42,19 +42,23 @@ export function Context(props: ContextProps) {
     const [votingWidgetsData, setVotingWidgets] = useState<any>(null);
 
     useEffect(() => {
-        const window1: any = window
-        if (!window1?.keplr) {
-            setIsWallet(false);
-        } else {
-            setIsWallet(true);
-        }
 
-        (async () => {
+        const checkWallet = async () => {
+            const window1: any = window
+            if (!window1?.keplr) {
+                setIsWallet(false);
+            } else {
+                setIsWallet(true);
+            }
             const data = await httpReqest(`${CHAIN_INFO.rest}/cosmos/gov/v1/params/voting`, "GET", null);
             if (!data?.error) {
                 setVotingWidgets(data?.data);
             }
-        })();
+        };
+
+        setTimeout(() => {
+            checkWallet();
+        }, 1000)
 
     }, []);
 

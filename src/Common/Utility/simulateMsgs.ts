@@ -27,7 +27,6 @@ export const simulateMsgs = async (
   memo: string = ""
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
-  console.log("account : ", account);
   
   if (account) {
     const unsignedTx = TxRaw.encode({
@@ -73,7 +72,6 @@ export const simulateMsgs = async (
         tx_bytes: Buffer.from(unsignedTx).toString("base64"),
       })
     );
-    console.log("simulatedResult : ", simulatedResult);
     
     if (!simulatedResult?.error) {
       const gasUsed = parseInt(simulatedResult?.data?.gas_info.gas_used);

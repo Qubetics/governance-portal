@@ -125,6 +125,9 @@ function CreateProposal() {
         toast.error("Please connect to wallet!");
         return;
       }
+
+      console.log("walletBalance: ", walletBalance);
+      
       if (!walletBalance) {
         toast.error("Insufficient funds!");
         return;
@@ -149,7 +152,7 @@ function CreateProposal() {
             },
             initialDeposit: [
               {
-                denom: CONST.chainName.toLowerCase(),
+                denom: CONST.currency.toLowerCase(),
                 amount: `${Number(propData?.deposit) * 10 ** 18}`,
               },
             ],
@@ -163,7 +166,7 @@ function CreateProposal() {
           [sendMsg],
           [
             {
-              denom: CONST.chainName.toLowerCase(),
+              denom: CONST.currency.toLowerCase(),
               amount: "100000000",
             },
           ]
@@ -175,7 +178,7 @@ function CreateProposal() {
           await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
             amount: [
               {
-                denom: CONST.chainName.toLowerCase(),
+                denom: CONST.currency.toLowerCase(),
                 amount: "100000000",
               },
             ],
