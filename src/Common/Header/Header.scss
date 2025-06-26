@@ -1,0 +1,60 @@
+.header-main {
+  position: fixed;
+  z-index: 99;
+  width: 100%;
+  transition: 0.3s all;
+
+  &_inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 102px;
+    gap: 10px;
+
+    &__left {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+      @media (max-width: 480px) {
+        gap: 18px;
+      }
+
+     
+      .svgLogo {
+        display: flex;
+        align-items: center;
+        font-size: 20px;
+        gap: 20px;
+        h3{
+          color: var(--white);
+          font-size: var(--headingFour);
+        }
+        svg {
+          cursor: pointer;
+
+          @media (max-width: 991px) {
+            height: 67px;
+            width: 58px;
+          }
+        }
+      }
+    }
+
+
+    &__right {
+      display: flex;
+      gap: 20px;
+
+
+
+      
+
+     
+    }
+  }
+}
+.sticky {
+    top: 0;
+    z-index: 99;
+    background-color: var(--black);
+  }

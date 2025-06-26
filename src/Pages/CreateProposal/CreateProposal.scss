@@ -1,0 +1,182 @@
+.createProposal {
+  margin-top: 30px;
+  @media (max-width: 580px) {
+    margin-top: 0;
+  }
+  .cosmosSec {
+    background: var(--gradientBG);
+    border: 1px solid var(--bordeColor);
+    padding: 27px 38px 18px 38px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+    &_inner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .cosMosDeatil {
+      text-align: left;
+
+      h2 {
+        color: var(--coreGray);
+        font-size: var(--headingTwo);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      p {
+        color: var(--white);
+        font-size: var(--largeParaGraph16);
+        font-weight: 400;
+        opacity: 0.7;
+        word-break: break-all;
+        svg {
+          cursor: pointer;
+        }
+      }
+    }
+    .connectWallet {
+      color: var(--blueB3C8E6);
+      font-size: 12px;
+      background-color: #0068ff33;
+      border: 1px solid var(--brandPurple);
+      border-radius: 10px;
+      padding: 5px 9px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+  }
+  .createContents {
+    background: var(--gradientBG);
+    border: 1px solid var(--bordeColor);
+    padding: 30px 36px;
+    border-radius: 20px;
+    margin: 20px 0;
+    @media (max-width: 580px) {
+      padding: 20px;
+    }
+    .innerContents {
+      background: var(--gradientBG);
+      border: 1px solid var(--bordeColor);
+      padding: 20px;
+      border-radius: 20px;
+      .versionCard {
+        background: var(--gradientBG);
+        border: 1px solid var(--bordeColor);
+        border-radius: 20px;
+        display: flex;
+        @media (max-width: 580px) {
+          flex-wrap: wrap;
+        }
+        .left {
+          padding: 28px 80px 28px 30px;
+          border-right: 1px solid #4c5458;
+          &:last-child {
+            border-right: 0;
+          }
+          @media (max-width: 580px) {
+            padding: 20px;
+            border: 0;
+          }
+          h4 {
+            color: var(--coreGray);
+            font-size: var(--mediumParaGraph);
+            font-weight: 600;
+            text-align: left;
+          }
+          p {
+            color: var(--grayAFB7C0);
+            font-size: var(--largeParaGraph16);
+            font-weight: 400;
+            text-align: left;
+          }
+        }
+      }
+    }
+    .ipfCard {
+      background: var(--gradientBG);
+      border: 1px solid var(--bordeColor);
+      border-radius: 20px;
+      padding: 18px 30px;
+      text-align: left;
+      margin-top: 16px;
+      h5 {
+        color: var(--coreGray);
+        font-size: var(--mediumParaGraph);
+        font-weight: 600;
+      }
+      p {
+        color: var(--grayAFB7C0);
+        font-size: var(--largeParaGraph16);
+        font-weight: 400;
+      }
+      .ant-input {
+        color: white;
+        padding: 7px 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(86, 94, 98, 0.6196078431);
+        background-color: transparent;
+        outline: none;
+        width: 100%;
+        margin-top: 5px;
+        &::placeholder {
+          color: var(--gray8D98A5);
+        }
+      }
+    }
+    .governanceHeading {
+      h2 {
+        color: var(--coreGray);
+        font-size: var(--largeParaGraph16);
+        font-weight: 600;
+        margin-top: 30px;
+        margin-bottom: 12px;
+        text-align: left;
+      }
+    }
+    .createProposalMultiBtn {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      margin-top: 50px;
+      justify-content: center;
+      .cmnBtn {
+        width: 100%;
+        max-width: 440px;
+      }
+    }
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.createProposalCard {
+  display: flex;
+  gap: 15px;
+  @media (max-width: 580px) {
+    flex-wrap: wrap;
+  }
+  .innerCardDes {
+    background: var(--gradientBG);
+    border: 1px solid var(--bordeColor);
+    border-radius: 20px;
+    padding: 18px 30px;
+    width: 100%;
+    p {
+      color: var(--grayAFB7C0);
+      font-size: var(--largeParaGraph16);
+      font-weight: 400;
+    }
+    h5 {
+      color: var(--coreGray);
+      font-size: var(--mediumParaGraph);
+      font-weight: 600;
+    }
+  }
+}

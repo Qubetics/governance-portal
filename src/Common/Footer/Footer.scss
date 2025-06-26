@@ -1,0 +1,150 @@
+.footer {
+  background: var(--black);
+  height: 50.57px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-direction: column;
+  // border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 5px;
+
+  p {
+    text-align: center;
+    color: var(--white);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    margin-top: 0px;
+
+    @media (max-width: 991px) {
+      font-size: 14px;
+    }
+
+    @media (max-width: 767px) {
+      font-size: 13px;
+      margin-top: 0px;
+    }
+  }
+
+  a {
+    color: #348cf5;
+    text-decoration: none;
+  }
+}
+
+.footernew {
+  background-color: var(--black);
+  margin-top: 100px;
+  padding: 16px 0px 15px;
+  width: 100%;
+  @media (max-width: 575px) {
+    padding: 5px;
+    margin-top: 30px;
+  }
+  &_topFooterItem {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--bordeColor);
+    padding-bottom: 12px;
+    @media (max-width: 575px) {
+      padding-top: 5px;
+    }
+    &_socialIcon {
+      display: flex;
+      gap: 8px;
+      transition: none !important;
+      gap: 8px;
+      a {
+        background-color: var(--bordeColor);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .githubIcon {
+          filter: invert(100%);
+        }
+        // &:hover {
+        //   background-color: $white;
+        // }
+      }
+      // a:hover svg {
+      //   fill: $black;
+      //   stroke: $black;
+      //   display: block;
+      // }
+    }
+    &_backTopTop {
+      display: flex;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      gap: 8px;
+      .rotateIcon {
+        svg {
+          rotate: 180deg;
+        }
+      }
+    }
+  }
+  .ant-row {
+    padding: 20px 0 10px 0;
+    a {
+      color: var(--white);
+      font-size: 12px;
+      padding-bottom: 10px;
+      transition: transform 0.3s ease, color 0.3s ease,
+        background-color 0.3s ease;
+      text-align: left;
+      @media (max-width: 575px) {
+        padding-bottom: 8px;
+      }
+      display: block;
+      &:hover {
+        opacity: 0.7;
+        color: var(--white);
+        transform: translateX(10px);
+      }
+    }
+    h2 {
+      color: var(--white);
+      display: flex;
+      font-weight: 500;
+      font-size: var(--headingTwo);
+      gap: 7px;
+      padding-bottom: 15px;
+      align-items: center;
+      svg {
+        width: 30px;
+        height: 30px;
+      }
+    }
+    h3 {
+      color: var(--white);
+      display: flex;
+      font-weight: 500;
+      font-size: var(--largeParaGraph);
+      gap: 7px;
+      padding-bottom: 15px;
+      text-align: left;
+    }
+    p {
+      font-size: 12px;
+      font-weight: 300;
+      max-width: 500px;
+      word-break: break-word;
+      text-align: left;
+    }
+  }
+  p {
+    color: var(--white);
+  }
+  &_year {
+    text-align: center;
+    border-top: 1px solid var(--bordeColor);
+    padding: 16px 0 4px 0;
+    font-size: 12px;
+  }
+}
