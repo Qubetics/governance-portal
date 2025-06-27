@@ -89,10 +89,13 @@ const Footer = () => {
           </Col>
           <Col xs={24} sm={12} lg={4}>
             <h3>Product & Services</h3>
-            <Link to="https://validator-testnet.qubetics.work/login" target="_blank">
+            <Link to="https://validator.qubetics.com/login" target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Validator App
             </Link>
-            <Link to="https://delegator-testnet.qubetics.work/login" target="_blank">
+            <Link to="https://ticsscan.com" target="_blank">
+              {process.env.REACT_APP_PROJECT_NAME ?? ""} Explorer App
+            </Link>
+            <Link to="https://delegator.qubetics.com/login" target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Delegator App
             </Link>
             <Link to="https://qubeqode.qubetics.com/work-space" target="_blank">
