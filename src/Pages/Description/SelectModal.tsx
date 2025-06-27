@@ -72,7 +72,7 @@ function SelectModal(props: any) {
         key.bech32Address,
         [protoMsgs],
         [{
-          denom: CONST.chainName.toLowerCase(),
+          denom: CONST.currency.toLowerCase(),
           amount: "236"
         }]
       );
@@ -87,7 +87,7 @@ function SelectModal(props: any) {
           [protoMsgs],
           {
             amount: [{
-              denom: CONST.chainName.toLowerCase(),
+              denom: CONST.currency.toLowerCase(),
               amount: "236",
             }],
             gas: Math.floor(gasUsed * 1.8).toString(),
