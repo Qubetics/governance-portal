@@ -92,7 +92,8 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
       key: "txHash",
       render: ((data: any) => {
         return <>
-          <a href={`${process.env.REACT_APP_EXPLORER_URL}/tx/${data}`} target="blank">{formatString(data ?? "", 10, 10)}</a>
+          {/* <a href={`${process.env.REACT_APP_EXPLORER_URL}/tx/${data}`} target="blank">{formatString(data ?? "", 10, 10)}</a> */}
+          <>{formatString(data ?? "", 10, 10)}</>
           <span className="pointer" onClick={() => (copyToClipBoard(data ?? ''))}> <CopyIcon /></span>
         </>
       })
@@ -339,13 +340,13 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
   );
   const CustomEmpty = () => (
     <Empty
-      image={<img src={NoData} alt="nodata"/>} 
+      image={<img src={NoData} alt="nodata" />}
       imageStyle={{
         height: 60,
       }}
       description={
-        <span style={{color:"#fff"}}>
-         Not Found
+        <span style={{ color: "#fff" }}>
+          Not Found
         </span>
       }
     />
@@ -390,7 +391,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
           <Table
             dataSource={apiData}
             columns={columns}
-            locale={{ emptyText: <CustomEmpty /> }} 
+            locale={{ emptyText: <CustomEmpty /> }}
             pagination={
               Number(tabData?.all) > CONST.liveProposalLimit && {
                 current: currentPageAll,
@@ -417,7 +418,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
           <Table
             dataSource={yesApiData}
             columns={columns}
-            locale={{ emptyText: <CustomEmpty /> }} 
+            locale={{ emptyText: <CustomEmpty /> }}
             pagination={
               Number(tabData?.yes) > CONST.liveProposalLimit && {
                 current: currentPageYes,
@@ -444,7 +445,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
           <Table
             dataSource={noApiData}
             columns={columns}
-            locale={{ emptyText: <CustomEmpty /> }} 
+            locale={{ emptyText: <CustomEmpty /> }}
             pagination={
               Number(tabData?.no) > CONST.liveProposalLimit && {
                 current: currentPageNo,
@@ -471,7 +472,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
           <Table
             dataSource={abstainApiData}
             columns={columns}
-            locale={{ emptyText: <CustomEmpty /> }} 
+            locale={{ emptyText: <CustomEmpty /> }}
             pagination={
               Number(tabData?.abstain) > CONST.liveProposalLimit && {
                 current: currentPageNo,
@@ -498,7 +499,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
           <Table
             dataSource={vetoApiData}
             columns={columns}
-            locale={{ emptyText: <CustomEmpty /> }} 
+            locale={{ emptyText: <CustomEmpty /> }}
             pagination={
               Number(tabData?.veto) > CONST.liveProposalLimit && {
                 current: currentPageNo,
