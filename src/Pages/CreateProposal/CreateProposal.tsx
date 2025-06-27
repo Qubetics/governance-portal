@@ -24,6 +24,7 @@ import {
 } from "../../Common/Utility";
 
 function CreateProposal() {
+  const [btnDisabled, setBtnDisabled] = useState(false);
   const [keplrModalOpen, setkeplrModalOpen] = useState(false);
   const [propData, setPropData] = useState({
     title: "",
@@ -80,11 +81,15 @@ function CreateProposal() {
       title: "",
       deposit: "",
     };
+
     if (!propData?.description) {
       msg.description = "Please enter description";
       error = true;
     } else if (!regex.test(propData.description)) {
       msg.description = `@#$%^&*(),.?":{}|_- Only These Special characters are allowed`;
+      error = true;
+    } else if (propData?.description.length > 10000) {
+      msg.description = "Only 10000 character allowed";
       error = true;
     }
 
@@ -93,6 +98,9 @@ function CreateProposal() {
       error = true;
     } else if (!regex.test(propData.title)) {
       msg.title = `@#$%^&*(),.?":{}|_- Only These Special characters are allowed`;
+      error = true;
+    } else if (propData?.title.length > 140) {
+      msg.title = "Only 140 character allowed";
       error = true;
     }
 
@@ -128,12 +136,13 @@ function CreateProposal() {
       }
 
       console.log("walletBalance: ", walletBalance);
-      
+
       if (!walletBalance) {
         toast.error("Insufficient funds!");
         return;
       }
       if (!inputValidation()) {
+        setBtnDisabled(true)
         const win: any = window;
         const key = await win.keplr.getKey(CHAIN_INFO.chainId);
         const title = propData?.title.trim();
@@ -202,6 +211,8 @@ function CreateProposal() {
         toast.error("Something went wrong!");
       }
       console.log("error while creating proposal : ", error);
+    } finally {
+      setBtnDisabled(false)
     }
   }
 
@@ -224,7 +235,7 @@ function CreateProposal() {
             toast.success("Successfully connected with Keplr wallet.");
           }
         } catch (error) {
-          toast.error("Please add chain id to your wallet.");
+          toast.error("Please add " + CONST.chainName.toUpperCase() + " network to your wallet.");
         }
       };
 
@@ -276,23 +287,21 @@ function CreateProposal() {
   const data = [
     {
       action: "Min Deposit",
-      days: `${
-        noExponent(
-          votingWidgetsData?.params?.min_deposit[0]?.amount
-            ? votingWidgetsData?.params?.min_deposit[0]?.amount / 10 ** 18
-            : 0
-        ) ?? "-"
-      } ${CONST.currency}`,
+      days: `${noExponent(
+        votingWidgetsData?.params?.min_deposit[0]?.amount
+          ? votingWidgetsData?.params?.min_deposit[0]?.amount / 10 ** 18
+          : 0
+      ) ?? "-"
+        } ${CONST.currency}`,
     },
     {
       action: "Max Deposit Period",
-      days: `${
-        convertSeconds(
-          votingWidgetsData?.params?.max_deposit_period
-            ? votingWidgetsData?.params?.max_deposit_period.split("s")[0]
-            : 0
-        ) ?? 0
-      }`,
+      days: `${convertSeconds(
+        votingWidgetsData?.params?.max_deposit_period
+          ? votingWidgetsData?.params?.max_deposit_period.split("s")[0]
+          : 0
+      ) ?? 0
+        }`,
     },
     {
       action: "Voting Period",
@@ -304,27 +313,24 @@ function CreateProposal() {
     },
     {
       action: "Quorum",
-      days: `${
-        votingWidgetsData?.params?.quorum
-          ? votingWidgetsData?.params?.quorum * 100
-          : 0
-      }%`,
+      days: `${votingWidgetsData?.params?.quorum
+        ? votingWidgetsData?.params?.quorum * 100
+        : 0
+        }%`,
     },
     {
       action: "Threshold",
-      days: `${
-        votingWidgetsData?.params?.threshold
-          ? votingWidgetsData?.params?.threshold * 100
-          : 0
-      }%`,
+      days: `${votingWidgetsData?.params?.threshold
+        ? votingWidgetsData?.params?.threshold * 100
+        : 0
+        }%`,
     },
     {
       action: "Veto Threshold",
-      days: `${
-        votingWidgetsData?.params?.veto_threshold
-          ? votingWidgetsData?.params?.veto_threshold * 100
-          : 0
-      }%`,
+      days: `${votingWidgetsData?.params?.veto_threshold
+        ? votingWidgetsData?.params?.veto_threshold * 100
+        : 0
+        }%`,
     },
   ];
 
@@ -437,7 +443,7 @@ function CreateProposal() {
               <CreateProposalCard data={data} />
               <div className="createProposalMultiBtn">
                 {/* <button className="commonBtn">Preview</button> */}
-                <button className="commonBtn" onClick={handleCreateProposal}>
+                <button disabled={btnDisabled} className="commonBtn" onClick={handleCreateProposal}>
                   Create Proposal
                 </button>
               </div>

@@ -52,6 +52,32 @@ export function calculateDaysRemaining(startDate: any, endDate: any) {
   }
 }
 
+export function calculateTimeRemaining(startDate: any, endDate: any) {
+  try {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diff = end.getTime() - start.getTime();
+    if (diff <= 0) return '0s';
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (3600 * 24));
+
+    if (days >= 1) {
+      return `${days}d`;
+    }
+
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return `${hours}h ${minutes}m ${seconds}s`;
+  } catch {
+    return '0s';
+  }
+}
+
+
 export function copyToClipBoard(content: string) {
   try {
     window.navigator.clipboard.writeText(content);
