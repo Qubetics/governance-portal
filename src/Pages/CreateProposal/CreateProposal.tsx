@@ -15,7 +15,8 @@ import CommonModal from "../../Common/commonModal/CommonModal";
 import { simulateMsgs } from "../../Common/Utility/simulateMsgs";
 import { TextProposal } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import { MsgSubmitProposal } from "cosmjs-types/cosmos/gov/v1beta1/tx";
-import { CopyIcon, Logo } from "../../Common/assets/StoreAsset/StoreAsset";
+import { CopyIcon } from "../../Common/assets/StoreAsset/StoreAsset";
+import logo from "../../logo.svg"
 import {
   convertSeconds,
   copyToClipBoard,
@@ -336,7 +337,7 @@ function CreateProposal() {
           <div className="cosmosSec">
             <div className="cosmosSec_inner">
               <div className="imgSec">
-                <Logo />
+                <img src={logo} alt="" />
               </div>
               <div className="cosMosDeatil">
                 <h2>{CONST.chainName.toUpperCase()}</h2>

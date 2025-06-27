@@ -122,7 +122,7 @@ const Footer = () => {
         </Row>
         <p className="footernew_year">
           {/* © 2024 {EXPLORER_CHAIN_NAME}. All Rights Reserved. */}
-          Copyright© 2024 {process.env.REACT_APP_PROJECT_NAME ?? ""}
+          © 2025 Copyright {process.env.REACT_APP_PROJECT_NAME ?? ""}
         </p>
       </div>
     </section>

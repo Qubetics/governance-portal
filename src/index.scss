@@ -31,7 +31,7 @@
   margin: 0;
 
   // Color vars//
-  --darkPurple: #112644;
+  --darkPurple: #000;
   --brandPurple: #348cf5;
   --bluetext: #00a6ff;
   --gradientBG: linear-gradient(
@@ -43,7 +43,7 @@
   --bordeColor: rgba(255, 255, 255, 0.1490196078);
   --white: #fff;
   --black: #000;
-  --blue21252c: #21252c;
+  --blue21252c: #464749;
   --coreGray: #e8eaed;
   --gray37373C: #37373c;
   --headerBg: #111b24;
@@ -345,18 +345,73 @@ html {
 
 .cmnTab {
   .ant-tabs-nav-list {
-    background-color: var(--gray37373C);
-    border-radius: 10px;
+    background-color: #121212;
+    border-radius: 25px;
   }
   .ant-tabs-nav::before {
     border: 0;
   }
   .ant-tabs-tab-active {
-    background-color: var(--blue0086FF);
-    border-radius: 10px;
-    .ant-tabs-tab-btn {
-      color: var(--white) !important;
+    margin: 0 0 0 0px !important;
+    // padding: 10px 24px;
+    font-size: 16px;
+    position: relative;
+    display: inline-block;
+    padding: 12.5px 20px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #fff;
+    background-color: #000;
+    text-decoration: none;
+    border: none;
+    border-radius: 30px;
+    overflow: hidden;
+    cursor: pointer;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 2.1px;
+      border-radius: 30px;
+      background: conic-gradient(
+        from var(--gradient-angle),
+        var(--clr-card),
+        var(--clr-1),
+        var(--clr-2),
+        var(--clr-3),
+        var(--clr-4),
+        var(--clr-5),
+        var(--clr-6),
+        var(--clr-2),
+        var(--clr-1),
+        var(--clr-card)
+      );
+      animation: rotate 2.5s linear infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: rotate 3s linear infinite;
     }
+  }
+
+  @keyframes rotate {
+    0% {
+      --gradient-angle: 0deg;
+    }
+
+    100% {
+      --gradient-angle: 360deg;
+    }
+  }
+
+  .ant-tabs-tab-btn {
+    color: #fff !important;
+  }
+  .ant-tabs-tab {
+    padding: 12.5px 20px;
   }
   .srchInput {
     background-color: transparent !important;
@@ -406,6 +461,9 @@ html {
 }
 .ant-progress-text {
   color: var(--white) !important;
+}
+.ant-progress-inner {
+  background-color: rgb(111 102 102 / 70%);
 }
 // cmnTab End css -----------
 

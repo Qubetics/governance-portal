@@ -12,6 +12,9 @@
     align-items: center;
     justify-content: space-between;
     margin-top: 20px;
+    @media (max-width: 580px) {
+    padding: 20px;
+  }
     &_inner {
       display: flex;
       align-items: center;
