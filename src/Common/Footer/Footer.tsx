@@ -109,7 +109,7 @@ const Footer = () => {
             <Link to="" target="_blank">
               Official web
             </Link>
-            <Link to="" target="_blank">
+            <Link to="https://docs.qubetics.com/" target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Network documentation
             </Link>
             <Link to="" target="_blank">
