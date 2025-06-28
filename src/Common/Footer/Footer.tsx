@@ -10,6 +10,7 @@ import {
 } from "../assets/StoreAsset/StoreAsset";
 import "./Footer.scss";
 import GitGub from "../assets/github.png";
+import { FOOTER_LINK } from "../constants";
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({
@@ -27,19 +28,19 @@ const Footer = () => {
       <div className="container">
         <div className="footernew_topFooterItem">
           <div className="footernew_topFooterItem_socialIcon">
-            <Link to="https://x.com/qubetics?mx=2" target="_blank">
+            <Link to={FOOTER_LINK?.twitter ?? ""} target="_blank">
               <Twitter />
             </Link>
-            <Link to="https://www.facebook.com/" target="_blank">
+            <Link to={FOOTER_LINK?.facebook ?? ""} target="_blank">
               <Facebook />
             </Link>
-            <Link to="https://t.me/qubetics" target="_blank">
+            <Link to={FOOTER_LINK?.telegram ?? ""} target="_blank">
               <Telegram />
             </Link>
-            <Link to="https://www.instagram.com/qubetics/#" target="_blank">
+            <Link to={FOOTER_LINK?.instagram ?? ""} target="_blank">
               <Instagram />
             </Link>
-            <Link to="https://github.com/Qubetics" target="_blank">
+            <Link to={FOOTER_LINK?.github ?? ""} target="_blank">
               <img
                 src={GitGub}
                 height={16}
@@ -80,22 +81,25 @@ const Footer = () => {
           </Col>
           <Col xs={24} sm={12} lg={4}>
             <h3>About Us</h3>
-            <Link to="https://www.qubetics.com/privacy-policy" target="_blank">
+            <Link to={FOOTER_LINK?.privacyPolicy ?? ""} target="_blank">
               Privacy Policy
             </Link>
-            <Link to="https://www.qubetics.com/terms-of-use" target="_blank">
+            <Link to={FOOTER_LINK?.terms ?? ""} target="_blank">
               Terms of Service
             </Link>
           </Col>
           <Col xs={24} sm={12} lg={4}>
             <h3>Product & Services</h3>
-            <Link to="https://validator-testnet.qubetics.work/login" target="_blank">
+            <Link to={FOOTER_LINK?.validator ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Validator App
             </Link>
-            <Link to="https://delegator-testnet.qubetics.work/login" target="_blank">
+            <Link to={FOOTER_LINK?.explorer ?? ""}target="_blank">
+              {process.env.REACT_APP_PROJECT_NAME ?? ""} Explorer App
+            </Link>
+            <Link to={FOOTER_LINK?.delegator ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Delegator App
             </Link>
-            <Link to="https://qubeqode.qubetics.com/work-space" target="_blank">
+            <Link to={FOOTER_LINK?.qubeQode ?? ""} target="_blank">
               {" "}
               {process.env.REACT_APP_PROJECT_NAME ?? ""} QubeQode
             </Link>
@@ -107,20 +111,20 @@ const Footer = () => {
               {" "}
               {process.env.REACT_APP_PROJECT_NAME ?? ""} App
             </Link> */}
-            <Link to="https://ide.qubetics.com/" target="_blank">
+            <Link to={FOOTER_LINK?.ide ?? ""} target="_blank">
               {" "}
               {process.env.REACT_APP_PROJECT_NAME ?? ""} IDE
             </Link>
           </Col>
           <Col xs={24} sm={12} lg={4}>
             <h3>Resources</h3>
-            <Link to="https://www.qubetics.com/" target="_blank">
+            <Link to={FOOTER_LINK?.officialWebsite ?? ""} target="_blank">
               Official web
             </Link>
-            <Link to="https://docs.qubetics.com/" target="_blank">
+            <Link to={FOOTER_LINK?.networkDoc ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Network documentation
             </Link>
-            <Link to="http://qubetics.gitbook.io/qubetics-docs" target="_blank">
+            <Link to={FOOTER_LINK?.documentation ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} documentation
             </Link>
           </Col>

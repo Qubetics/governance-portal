@@ -7,6 +7,24 @@ export const CONST = {
   currency: process.env.REACT_APP_COIN_DENOM ?? "",
 };
 
+export const FOOTER_LINK: {
+  validator: string;
+  explorer: string;
+  delegator: string;
+  qubeQode: string;
+  privacyPolicy: string;
+  terms: string;
+  ide: string;
+  officialWebsite: string;
+  networkDoc: string;
+  documentation: string;
+  twitter: string;
+  facebook: string;
+  telegram: string;
+  instagram: string;
+  github: string;
+} = JSON.parse(process.env.REACT_APP_FOOTER_LINKS ?? "{}");
+
 export const CHAIN_INFO: ChainInfo = {
   // Chain-id of the Osmosis chain.
   chainId: process.env.REACT_APP_CHAIN_ID ?? "",
@@ -25,7 +43,7 @@ export const CHAIN_INFO: ChainInfo = {
     // # of decimal points to convert minimal denomination to user-facing denomination.
     coinDecimals: Number(process.env.REACT_APP_COIN_DECIMALS ?? 18),
     coinGeckoId: process.env.REACT_APP_COIN_GECKO_ID,
-    coinImageUrl:process.env.REACT_APP_COIN_IMAGE_URL
+    coinImageUrl: process.env.REACT_APP_COIN_IMAGE_URL,
   },
   // (Optional) If you have a wallet webpage used to stake the coin then provide the url to the website in `walletUrlForStaking`.
   // The 'stake' button in Keplr extension will link to the webpage.
