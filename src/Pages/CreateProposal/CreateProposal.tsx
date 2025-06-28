@@ -22,8 +22,10 @@ import {
   copyToClipBoard,
   noExponent,
 } from "../../Common/Utility";
+import { useNavigate } from "react-router-dom";
 
 function CreateProposal() {
+  const navigate = useNavigate();
   const [btnDisabled, setBtnDisabled] = useState(false);
   const [keplrModalOpen, setkeplrModalOpen] = useState(false);
   const [propData, setPropData] = useState({
@@ -195,6 +197,7 @@ function CreateProposal() {
             gas: Math.floor(gasUsed * 1.5).toString(),
           });
           toast.success("Proposal created successfully");
+          navigate("/")
         } else {
           throw new Error("Something went wrong!");
         }
@@ -204,6 +207,7 @@ function CreateProposal() {
           deposit: "",
         });
       }
+      
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error?.message ?? "Something went wrong!");
