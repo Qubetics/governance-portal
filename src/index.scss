@@ -278,7 +278,7 @@ html {
 .ant-pagination {
   li {
     a {
-      color: #000;
+      color: grey !important;
     }
   }
   .ant-pagination-item-ellipsis {
@@ -286,13 +286,16 @@ html {
   }
 
   .ant-pagination-prev {
-    background: linear-gradient(95.53deg, #0068ff -1.41%, #00a7ff 100.25%);
+    // background: linear-gradient(95.53deg, #0068ff -1.41%, #00a7ff 100.25%);
+    background: transparent !important;
     button {
-      color: var(--white);
+      // color: var(--white);
+      color: white !important;
     }
   }
   .ant-pagination-next {
-    background: linear-gradient(95.53deg, #0068ff -1.41%, #00a7ff 100.25%);
+    // background: linear-gradient(95.53deg, #0068ff -1.41%, #00a7ff 100.25%);
+    background: transparent !important;
     button {
       color: var(--white);
     }
@@ -317,20 +320,23 @@ html {
     // }
   }
 }
+
 .ant-pagination-item {
+  background: transparent !important;
   &:hover {
-    border: 1px solid #0068ff;
+    // border: 1px solid #0068ff;
     a {
       color: #fff !important;
     }
   }
 }
 .ant-pagination .ant-pagination-item-active {
-  background: linear-gradient(
-    95.53deg,
-    #0068ff -1.41%,
-    #00a7ff 100.25%
-  ) !important;
+  // background: linear-gradient(
+  //   95.53deg,
+  //   #0068ff -1.41%,
+  //   #00a7ff 100.25%
+  // ) !important;
+  border: none;
   a {
     color: #fff !important;
   }
@@ -614,5 +620,21 @@ input::placeholder {
     // &:hover {
     //   color: #006bff;
     // }
+  }
+}
+
+.lottieIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  svg {
+    height: 220px !important;
+    width: 220px !important;
+
+    @media (max-width: 767px) {
+      height: 160px !important;
+      width: 160px !important;
+    }
   }
 }

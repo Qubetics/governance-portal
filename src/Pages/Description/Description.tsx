@@ -375,15 +375,17 @@ function Description() {
         onClose={handleKeplrModal}
         title="Connect Wallet"
         content={
+          <>
           <div className="keplerContent" onClick={connectWallet}>
             <img src={keplr} alt="keplr" />
             <div style={{ cursor: "pointer" }}>
               <h4>keplr</h4>
-              <p>
-                If you use keplr Wallet, you will have access to all features
-              </p>
             </div>
           </div>
+              <p style={{color: "#fff"}}>
+               Note: If you use keplr Wallet, you will have access to all features
+              </p>
+              </>
         }
       />
       <CommonModal

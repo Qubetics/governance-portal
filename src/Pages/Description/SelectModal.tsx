@@ -122,8 +122,8 @@ function SelectModal(props: any) {
         It will take 1 transactions
       </p>
       <h3>{process.env?.REACT_APP_PROJECT_NAME ?? ""}</h3>
+        {/* <Logo /> */}
       <div className="selectOptionModal_whitelist">
-        <Logo />
         <div>
           <h4>
             #{data?.proposalId}. <span>{data?.title}</span>
