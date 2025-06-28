@@ -25,6 +25,7 @@ import {
   flooreDecimals,
   calculateTimeRemaining,
   calculateElapsedTimePercentage,
+  ensureKeplrConnected,
 } from "../../Common/Utility";
 
 function Description() {
@@ -38,10 +39,10 @@ function Description() {
   const [modalVisible, setModalVisible] = useState(false);
   const [keplrModalOpen, setkeplrModalOpen] = useState(false);
   const {
+    setIsWallet,
     isWallet,
     setWalletAddress,
     walletAddress,
-    setWalletBalance,
     votingWidgetsData,
   } = useContext(UserContext);
   const [progressPercentage, setProgressPercentage] = useState<any>(0);
@@ -218,63 +219,16 @@ function Description() {
     },
   ];
 
-  function connectWallet() {
-    if (isWallet) {
-      const getKeyFromKeplr = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-          if (key) {
-            setWalletAddress(key.bech32Address);
-            toast.success("Successfully connected with Keplr wallet.");
-          }
-        } catch (error) {
-          toast.error("Please add " + CONST.chainName.toUpperCase() + " network to your wallet.");
-        }
-      };
+  async function connectWallet() {
+    const data = await ensureKeplrConnected();
 
-      const getBalance = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-
-          if (key) {
-            const uri = `${CHAIN_INFO.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
-            const data = await httpReqest(uri, "GET", null);
-
-            if (!data?.error) {
-              const balance = data.data?.balances.find(
-                (balance: any) =>
-                  balance.denom ===
-                  (CHAIN_INFO?.stakeCurrency?.coinDenom ?? "").toLowerCase()
-              );
-              const decimal = CHAIN_INFO.currencies.find(
-                (currency) =>
-                  currency.coinMinimalDenom ===
-                  CHAIN_INFO.stakeCurrency?.coinMinimalDenom
-              )?.coinDecimals;
-
-              if (balance) {
-                const amount = new Dec(balance?.amount, Number(decimal ?? 0));
-                setWalletBalance(`${amount.toString(Number(decimal))}`);
-              } else {
-                setWalletBalance(0);
-              }
-            } else {
-              setWalletBalance(0);
-            }
-          }
-        } catch (error) {
-          console.log("error while fetching balance from keplr : ", error);
-          setWalletBalance(0);
-        }
-      };
-      getKeyFromKeplr();
-      getBalance();
-      handleKeplrModal();
-    } else {
-      toast.error("Please install keplr extension");
+    if (data?.address) {
+      setIsWallet(true);
+      setWalletAddress(data?.address);
+      localStorage.setItem("wltConnected", "true");
+      localStorage.setItem("wltAddress", data?.address);
     }
+    handleKeplrModal();
   }
 
   return (
@@ -303,7 +257,7 @@ function Description() {
                     : ""
                 }
                 {propData?.status === "voting" ? (
-                  walletAddress ? (
+                  walletAddress && isWallet ? (
                     <button
                       className="commonBtn"
                       onClick={handleVotingModal}

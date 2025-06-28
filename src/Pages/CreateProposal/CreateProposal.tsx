@@ -1,11 +1,9 @@
 import { Input } from "antd";
 import "./CreateProposal.scss";
 import toast from "react-hot-toast";
-import { Dec } from "@keplr-wallet/unit";
 import { useContext, useState } from "react";
 import keplr from "../../Common/assets/keplr.svg";
 import { UserContext } from "../../Context/store";
-import { httpReqest } from "../../Common/httpRequest";
 import CreateProposalCard from "./CreateProposalCard";
 import { sendMsgs } from "../../Common/Utility/sendMsgs";
 import CustomInput from "../../Common/Input/CustomInput";
@@ -20,6 +18,8 @@ import logo from "../../logo.svg"
 import {
   convertSeconds,
   copyToClipBoard,
+  ensureKeplrConnected,
+  getBalance,
   noExponent,
 } from "../../Common/Utility";
 import { useNavigate } from "react-router-dom";
@@ -40,14 +40,16 @@ function CreateProposal() {
   });
   const {
     isWallet,
-    walletBalance,
+    // walletBalance,
     walletAddress,
     setWalletAddress,
-    setWalletBalance,
+    setIsWallet,
+    // setWalletBalance,
     votingWidgetsData,
   } = useContext(UserContext);
 
   const { TextArea } = Input;
+
   function handleInput(e: any) {
     const name = e.target.name;
     const value = e.target.value;
@@ -114,9 +116,6 @@ function CreateProposal() {
         minimumDeposite
       )}. Please enter a higher amount.`;
       error = true;
-    } else if (+propData?.deposit > Number(walletBalance ?? 0)) {
-      msg.deposit = `Insufficient funds`;
-      error = true;
     }
 
     setErrMsg(msg);
@@ -137,12 +136,15 @@ function CreateProposal() {
         return;
       }
 
-      console.log("walletBalance: ", walletBalance);
+      const balance = await getBalance(walletAddress)
+      console.log("balance: ", balance);
 
-      if (!walletBalance) {
-        toast.error("Insufficient funds!");
+      if (+propData?.deposit > Number(balance ?? 0)) {
+        toast.error("Insufficient funds");
         return;
       }
+
+
       if (!inputValidation()) {
         setBtnDisabled(true)
         const win: any = window;
@@ -207,7 +209,7 @@ function CreateProposal() {
           deposit: "",
         });
       }
-      
+
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error?.message ?? "Something went wrong!");
@@ -224,68 +226,16 @@ function CreateProposal() {
     setkeplrModalOpen(!keplrModalOpen);
   };
 
-  function connectWallet() {
-    console.log("isWallet : ", isWallet);
+  async function connectWallet() {
+    const data = await ensureKeplrConnected();
 
-    if (isWallet) {
-      const getKeyFromKeplr = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-          console.log("key : ", key);
-
-          if (key) {
-            setWalletAddress(key.bech32Address);
-            toast.success("Successfully connected with Keplr wallet.");
-          }
-        } catch (error) {
-          toast.error("Please add " + CONST.chainName.toUpperCase() + " network to your wallet.");
-        }
-      };
-
-      const getBalance = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-
-          if (key) {
-            const uri = `${CHAIN_INFO.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
-            const data = await httpReqest(uri, "GET", null);
-
-            if (data) {
-              const balance = data?.data?.balances.find(
-                (balance: any) =>
-                  balance.denom ===
-                  (CHAIN_INFO?.stakeCurrency?.coinDenom ?? "").toLowerCase()
-              );
-              const decimal = CHAIN_INFO.currencies.find(
-                (currency) =>
-                  currency.coinMinimalDenom ===
-                  CHAIN_INFO.stakeCurrency?.coinMinimalDenom
-              )?.coinDecimals;
-
-              if (balance) {
-                const amount = new Dec(balance?.amount, Number(decimal ?? 0));
-                setWalletBalance(`${amount.toString(Number(decimal))}`);
-              } else {
-                setWalletBalance(0);
-              }
-            } else {
-              setWalletBalance(0);
-            }
-          }
-        } catch (error) {
-          console.log("error while fetching balance from keplr : ", error);
-          setWalletBalance(0);
-        }
-      };
-
-      getKeyFromKeplr();
-      getBalance();
-      handleKeplrModal();
-    } else {
-      toast.error("Please install keplr extension");
+    if (data?.address) {
+      setIsWallet(true);
+      setWalletAddress(data?.address);
+      localStorage.setItem("wltConnected", "true");
+      localStorage.setItem("wltAddress", data?.address);
     }
+    handleKeplrModal();
   }
 
   const data = [
@@ -369,7 +319,7 @@ function CreateProposal() {
                 </p>
               </div>
             </div>
-            {!walletAddress && (
+            {(!isWallet || !walletAddress) && (
               <button className=" commonBtn" onClick={handleKeplrModal}>
                 Connect Wallet
               </button>
@@ -461,16 +411,16 @@ function CreateProposal() {
         title="Connect Wallet"
         content={
           <>
-          <div className="keplerContent" onClick={connectWallet}>
-            <img src={keplr} alt="keplr" />
-            <div style={{ cursor: "pointer" }}>
-              <h4>keplr</h4>
+            <div className="keplerContent" onClick={connectWallet}>
+              <img src={keplr} alt="keplr" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>keplr</h4>
+              </div>
             </div>
-          </div>
-              <p style={{color: "#fff",fontSize:"large"}}>
-               Note: If you use Keplr Wallet, you will have access to all features
-              </p>
-              </>
+            <p style={{ color: "#fff", fontSize: "large" }}>
+              Note: If you use Keplr Wallet, you will have access to all features
+            </p>
+          </>
         }
       />
     </>

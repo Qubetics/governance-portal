@@ -5,14 +5,14 @@ import { CHAIN_INFO, CONST } from "../../Common/constants";
 import { sendMsgs } from "../../Common/Utility/sendMsgs";
 // import CustomInput from "../../Common/Input/CustomInput";
 import { simulateMsgs } from "../../Common/Utility/simulateMsgs";
-import { calculateTimeRemaining, formatDate } from "../../Common/Utility";
+import { calculateTimeRemaining, formatDate, getBalance } from "../../Common/Utility";
 import { MsgVote } from "../../proto-types-gen/src/cosmos/gov/v1beta1/tx";
 import { InfoIcon, Logo } from "../../Common/assets/StoreAsset/StoreAsset";
 
 
 function SelectModal(props: any) {
   const [btnDisable, setBtnDisable] = useState(true);
-  const { walletAddress, walletBalance } = useContext(UserContext);
+  const { walletAddress } = useContext(UserContext);
   const [selectedOption, setSelectedOption] = useState<null | number>(null)
   const { data, close } = props;
 
@@ -58,10 +58,19 @@ function SelectModal(props: any) {
         toast.error("Please Select Option!");
         return;
       }
-      if (!walletBalance) {
-        toast.error("Insufficient funds!");
+
+       if (!walletAddress) {
+        toast.error("Please connect to wallet!");
         return;
       }
+
+      const balance = await getBalance(walletAddress)
+      
+      if (!balance) {
+        toast.error("Insufficient funds");
+        return;
+      }
+
       setBtnDisable(true);
       const win: any = window;
       const key = await win.keplr.getKey(CHAIN_INFO.chainId);
