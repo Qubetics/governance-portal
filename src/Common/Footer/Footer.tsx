@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Facebook,
   Instagram,
-  Logo,
+  // Logo,
   Telegram,
   Twitter,
   Uparrow,
@@ -11,6 +11,8 @@ import {
 import "./Footer.scss";
 import GitGub from "../assets/github.png";
 import { FOOTER_LINK } from "../constants";
+import logo from "../../logo.svg";
+
 const Footer = () => {
   const scrollToTop = () => {
     window.scrollTo({
@@ -70,7 +72,7 @@ const Footer = () => {
           <Col xs={24} sm={12} lg={12}>
             <h2>
               {" "}
-              <Logo />
+              <img src={logo} alt="" />
               Powered By {process.env.REACT_APP_PROJECT_NAME ?? ""}
             </h2>
             <p>
@@ -93,7 +95,7 @@ const Footer = () => {
             <Link to={FOOTER_LINK?.validator ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Validator App
             </Link>
-            <Link to={FOOTER_LINK?.explorer ?? ""}target="_blank">
+            <Link to={FOOTER_LINK?.explorer ?? ""} target="_blank">
               {process.env.REACT_APP_PROJECT_NAME ?? ""} Explorer App
             </Link>
             <Link to={FOOTER_LINK?.delegator ?? ""} target="_blank">
