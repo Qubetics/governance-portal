@@ -1,6 +1,7 @@
-import { useState, createContext, useEffect, ReactNode } from "react";
+import { Dec } from "@keplr-wallet/unit";
 import { CHAIN_INFO } from "../Common/constants";
 import { httpReqest } from "../Common/httpRequest";
+import { useState, createContext, useEffect, ReactNode } from "react";
 
 interface UserContextType {
     wallet: any | null;
@@ -9,8 +10,8 @@ interface UserContextType {
     setWalletAddress: React.Dispatch<React.SetStateAction<any | null>>;
     isWallet: boolean;
     setIsWallet: React.Dispatch<React.SetStateAction<boolean>>;
-    walletBalance: number | string | null;
-    setWalletBalance: React.Dispatch<React.SetStateAction<number | string | null>>;
+    // walletBalance: number | string | null;
+    // setWalletBalance: React.Dispatch<React.SetStateAction<number | string | null>>;
     votingWidgetsData: any;
     setVotingWidgets: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -22,8 +23,8 @@ const defaultValue: UserContextType = {
     setWalletAddress: () => { },
     isWallet: false,
     setIsWallet: () => { },
-    walletBalance: null,
-    setWalletBalance: () => { },
+    // walletBalance: null,
+    // setWalletBalance: () => { },
     votingWidgetsData: null,
     setVotingWidgets: () => { },
 };
@@ -35,31 +36,38 @@ interface ContextProps {
 }
 
 export function Context(props: ContextProps) {
-    const [wallet, setWallet] = useState<any | null>(null);
+    const [wallet, setWallet] = useState<any | null>(localStorage.getItem("wltConnected"));
     const [isWallet, setIsWallet] = useState<boolean>(false);
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
-    const [walletBalance, setWalletBalance] = useState<number | string | null>(null);
     const [votingWidgetsData, setVotingWidgets] = useState<any>(null);
 
     useEffect(() => {
 
-        const checkWallet = async () => {
-            const window1: any = window
-            if (!window1?.keplr) {
-                setIsWallet(false);
-            } else {
-                setIsWallet(true);
-            }
+        const value = localStorage.getItem("wltConnected");
+        const address = localStorage.getItem("wltAddress");
+
+        if (address) {
+            setWalletAddress(address)
+        }
+
+        console.log("value:  ", value);
+
+        if (value === "true") {
+            setIsWallet(true);
+        } else {
+            setIsWallet(false);
+        }
+
+
+    }, []);
+
+    useEffect(() => {
+        (async () => {
             const data = await httpReqest(`${CHAIN_INFO.rest}/cosmos/gov/v1/params/voting`, "GET", null);
             if (!data?.error) {
                 setVotingWidgets(data?.data);
             }
-        };
-
-        setTimeout(() => {
-            checkWallet();
-        }, 1000)
-
+        })()
     }, []);
 
     const obj = {
@@ -67,8 +75,6 @@ export function Context(props: ContextProps) {
         setWallet,
         isWallet,
         setIsWallet,
-        walletBalance,
-        setWalletBalance,
         walletAddress,
         setWalletAddress,
         votingWidgetsData,

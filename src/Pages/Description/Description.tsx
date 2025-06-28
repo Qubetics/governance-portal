@@ -12,35 +12,37 @@ import DescriptionCard from "./DescriptionCard";
 import { UserContext } from "../../Context/store";
 import keplr from "../../Common/assets/keplr.svg";
 import TransactionDModal from "./TransactionDModal";
-import { CHAIN_INFO, CONST } from "../../Common/constants";
 import DescriptionSummary from "./DescriptionSummary";
 import { httpReqest } from "../../Common/httpRequest";
 import { useContext, useEffect, useState } from "react";
+import { CHAIN_INFO, CONST } from "../../Common/constants";
 import BackButton from "../../Common/BackButton/BackButton";
 import CommonModal from "../../Common/commonModal/CommonModal";
 import { Vooting } from "../../Common/assets/StoreAsset/StoreAsset";
 import {
   formatDate,
   noExponent,
-  calculateDaysRemaining,
-  calculateElapsedTimePercentage,
   flooreDecimals,
+  calculateTimeRemaining,
+  calculateElapsedTimePercentage,
+  ensureKeplrConnected,
 } from "../../Common/Utility";
 
 function Description() {
   const { id } = useParams();
-  const [propData, setData] = useState<any>(null);
   const [turnout, setTurnOut] = useState(0);
+  // const [voteDone, SetVoted] = useState(0);
+  const [propData, setData] = useState<any>(null);
   const [tallyData, setTallyData] = useState<any>([]);
   const [voterData, setVoterData] = useState<any>({});
   const [votingModal, setVotingModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [keplrModalOpen, setkeplrModalOpen] = useState(false);
   const {
+    setIsWallet,
     isWallet,
     setWalletAddress,
     walletAddress,
-    setWalletBalance,
     votingWidgetsData,
   } = useContext(UserContext);
   const [progressPercentage, setProgressPercentage] = useState<any>(0);
@@ -84,117 +86,119 @@ function Description() {
     return maxKey;
   }
 
-  useEffect(() => {
-    (async () => {
-      try {
-        let totalTally = 0;
-        let bondedT = 0;
-        const bondedRes = await httpReqest(
-          CHAIN_INFO.rest + "/cosmos/staking/v1beta1/pool",
-          "GET",
-          null
+  const fetchProposal = async () => {
+    try {
+      let totalTally = 0;
+      let bondedT = 0;
+      const bondedRes = await httpReqest(
+        CHAIN_INFO.rest + "/cosmos/staking/v1beta1/pool",
+        "GET",
+        null
+      );
+
+      bondedT = Number(bondedRes?.data?.pool?.bonded_tokens ?? 0);
+
+      const res = await httpReqest(
+        process.env.REACT_APP_BACKEND_URL + "/" + CONST.chainName.toLowerCase() + "/proposals/id/" + id,
+        "GET",
+        null
+      );
+
+      if (!res?.error) {
+        setData(res?.data?.data?.proposal);
+        const tally = JSON.parse(res?.data?.data?.proposal?.tally);
+
+        const tallyKey = {
+          yes: tally?.yes_count
+            ? noExponent(
+              Number(tally?.yes_count) /
+              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
+            )
+            : 0,
+          no: tally?.no_count
+            ? noExponent(
+              Number(tally?.no_count) /
+              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
+            )
+            : 0,
+          veto: tally?.no_with_veto_count
+            ? noExponent(
+              Number(tally?.no_with_veto_count) /
+              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
+            )
+            : 0,
+          abstain: tally?.abstain_count
+            ? noExponent(
+              Number(tally?.abstain_count) /
+              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
+            )
+            : 0,
+        };
+
+        const key = findKeyOfLargestValue(tallyKey);
+
+        const percentageElapsed = calculateElapsedTimePercentage(
+          res.data?.data?.proposal?.votingStartTime,
+          res.data?.data?.proposal?.votingEndTime
         );
 
-        bondedT = Number(bondedRes?.data?.pool?.bonded_tokens ?? 0);
+        totalTally =
+          Number(tally?.abstain_count) +
+          Number(tally?.no_count) +
+          Number(tally?.no_with_veto_count) +
+          Number(tally?.yes_count);
+        const turnOutVal =
+          totalTally && bondedT ? (totalTally / bondedT) * 100 : 0;
 
-        const res = await httpReqest(
-          process.env.REACT_APP_BACKEND_URL + "/" + CONST.chainName.toLowerCase() + "/proposals/id/" + id,
-          "GET",
-          null
-        );
+        setTurnOut(turnOutVal <= 0 ? 0 : turnOutVal);
+        setVoterData(tally);
+        setProgressPercentage(percentageElapsed);
 
-        if (!res?.error) {
-          setData(res?.data?.data?.proposal);
-          const tally = JSON.parse(res?.data?.data?.proposal?.tally);
-
-          const tallyKey = {
-            yes: tally?.yes_count
-              ? noExponent(
-                Number(tally?.yes_count) /
-                10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-              )
-              : 0,
-            no: tally?.no_count
-              ? noExponent(
-                Number(tally?.no_count) /
-                10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-              )
-              : 0,
-            veto: tally?.no_with_veto_count
-              ? noExponent(
-                Number(tally?.no_with_veto_count) /
-                10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-              )
-              : 0,
-            abstain: tally?.abstain_count
-              ? noExponent(
-                Number(tally?.abstain_count) /
-                10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-              )
-              : 0,
-          };
-
-          const key = findKeyOfLargestValue(tallyKey);
-
-          const percentageElapsed = calculateElapsedTimePercentage(
-            res.data?.data?.proposal?.votingStartTime,
-            res.data?.data?.proposal?.votingEndTime
-          );
-
-          totalTally =
-            Number(tally?.abstain_count) +
-            Number(tally?.no_count) +
-            Number(tally?.no_with_veto_count) +
-            Number(tally?.yes_count);
-          const turnOutVal =
-            totalTally && bondedT ? (totalTally / bondedT) * 100 : 0;
-
-          setTurnOut(turnOutVal <= 0 ? 0 : turnOutVal);
-          setVoterData(tally);
-          setProgressPercentage(percentageElapsed);
-
-          if (!tallyData?.length) {
-            setTallyData([
-              ...tallyData,
-              {
-                action: "YES",
-                // percentage: tallyKey?.yes && totalTally ? (noExponent(+tallyKey?.yes / totalTally * 100 )?? 0 ): "",
-                percentage: "",
-                balance: tallyKey?.yes,
-                className: "green",
-                border: key === "yes",
-              },
-              {
-                action: "NO",
-                // percentage:  tallyKey?.no && totalTally ? (noExponent(+tallyKey?.no / totalTally * 100 )?? 0 ): "",
-                percentage: "",
-                balance: tallyKey?.no,
-                className: "red",
-                border: key === "no",
-              },
-              {
-                action: "VETO",
-                // percentage:  tallyKey?.veto && totalTally ? (noExponent(+tallyKey?.veto / totalTally * 100 )?? 0 ): "",
-                percentage: "",
-                balance: tallyKey?.veto,
-                className: "pink",
-                border: key === "veto",
-              },
-              {
-                action: "Abstain",
-                // percentage:  tallyKey?.abstain && totalTally ? (noExponent(+tallyKey?.abstain / totalTally * 100 )?? 0 ): "",
-                percentage: "",
-                balance: tallyKey?.abstain,
-                className: "",
-                border: key === "abstain",
-              },
-            ]);
-          }
+        if (!tallyData?.length) {
+          setTallyData([
+            ...tallyData,
+            {
+              action: "YES",
+              // percentage: tallyKey?.yes && totalTally ? (noExponent(+tallyKey?.yes / totalTally * 100 )?? 0 ): "",
+              percentage: "",
+              balance: tallyKey?.yes,
+              className: "green",
+              border: key === "yes",
+            },
+            {
+              action: "NO",
+              // percentage:  tallyKey?.no && totalTally ? (noExponent(+tallyKey?.no / totalTally * 100 )?? 0 ): "",
+              percentage: "",
+              balance: tallyKey?.no,
+              className: "red",
+              border: key === "no",
+            },
+            {
+              action: "VETO",
+              // percentage:  tallyKey?.veto && totalTally ? (noExponent(+tallyKey?.veto / totalTally * 100 )?? 0 ): "",
+              percentage: "",
+              balance: tallyKey?.veto,
+              className: "pink",
+              border: key === "veto",
+            },
+            {
+              action: "Abstain",
+              // percentage:  tallyKey?.abstain && totalTally ? (noExponent(+tallyKey?.abstain / totalTally * 100 )?? 0 ): "",
+              percentage: "",
+              balance: tallyKey?.abstain,
+              className: "",
+              border: key === "abstain",
+            },
+          ]);
         }
-      } catch (error) {
-        console.log("erorr while fething or setting up api data ", error);
       }
-    })();
+    } catch (error) {
+      console.log("erorr while fething or setting up api data ", error);
+    }
+  }
+
+  useEffect(() => {
+    fetchProposal();
   }, []);
 
   const items: TabsProps["items"] = [
@@ -215,63 +219,16 @@ function Description() {
     },
   ];
 
-  function connectWallet() {
-    if (isWallet) {
-      const getKeyFromKeplr = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-          if (key) {
-            setWalletAddress(key.bech32Address);
-            toast.success("Successfully connected with Keplr wallet.");
-          }
-        } catch (error) {
-          toast.error("Please add chain id to your wallet.");
-        }
-      };
+  async function connectWallet() {
+    const data = await ensureKeplrConnected();
 
-      const getBalance = async () => {
-        try {
-          const win: any = window;
-          const key = await win.keplr?.getKey(CHAIN_INFO.chainId);
-
-          if (key) {
-            const uri = `${CHAIN_INFO.rest}/cosmos/bank/v1beta1/balances/${key.bech32Address}?pagination.limit=1000`;
-            const data = await httpReqest(uri, "GET", null);
-
-            if (!data?.error) {
-              const balance = data.data?.balances.find(
-                (balance: any) =>
-                  balance.denom ===
-                  (CHAIN_INFO?.stakeCurrency?.coinDenom ?? "").toLowerCase()
-              );
-              const decimal = CHAIN_INFO.currencies.find(
-                (currency) =>
-                  currency.coinMinimalDenom ===
-                  CHAIN_INFO.stakeCurrency?.coinMinimalDenom
-              )?.coinDecimals;
-
-              if (balance) {
-                const amount = new Dec(balance?.amount, Number(decimal ?? 0));
-                setWalletBalance(`${amount.toString(Number(decimal))}`);
-              } else {
-                setWalletBalance(0);
-              }
-            } else {
-              setWalletBalance(0);
-            }
-          }
-        } catch (error) {
-          console.log("error while fetching balance from keplr : ", error);
-          setWalletBalance(0);
-        }
-      };
-      getKeyFromKeplr();
-      getBalance();
-      handleKeplrModal();
-    } else {
-      toast.error("Please install keplr extension");
+    if (data?.address) {
+      setIsWallet(true);
+      setWalletAddress(data?.address);
+      localStorage.setItem("wltConnected", "true");
+      localStorage.setItem("wltAddress", data?.address);
     }
+    handleKeplrModal();
   }
 
   return (
@@ -300,7 +257,7 @@ function Description() {
                     : ""
                 }
                 {propData?.status === "voting" ? (
-                  walletAddress ? (
+                  walletAddress && isWallet ? (
                     <button
                       className="commonBtn"
                       onClick={handleVotingModal}
@@ -344,11 +301,11 @@ function Description() {
                     <div className="topHeading">
                       <h3>Progress</h3>
                       <p>
-                        {calculateDaysRemaining(
+                        {calculateTimeRemaining(
                           new Date(),
                           propData?.votingEndTime
                         )}{" "}
-                        days remaining
+                        remaining
                       </p>
                     </div>
                     <Progress percent={progressPercentage} showInfo={false} />
@@ -372,15 +329,17 @@ function Description() {
         onClose={handleKeplrModal}
         title="Connect Wallet"
         content={
+          <>
           <div className="keplerContent" onClick={connectWallet}>
             <img src={keplr} alt="keplr" />
             <div style={{ cursor: "pointer" }}>
               <h4>keplr</h4>
-              <p>
-                If you use keplr Wallet, you will have access to all features
-              </p>
             </div>
           </div>
+              <p style={{color: "#fff"}}>
+               Note: If you use keplr Wallet, you will have access to all features
+              </p>
+              </>
         }
       />
       <CommonModal

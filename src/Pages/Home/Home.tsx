@@ -361,7 +361,7 @@ function Home() {
                           { value: "rejected", label: "Rejected" },
                           { value: "voting", label: "Voting" },
                           { value: "passed", label: "Passed" },
-                          { value: "deposit", label: "Deposit" },
+                          // { value: "deposit", label: "Deposit" },
                           { value: "failed", label: "Failed" },
                         ]}
                       />

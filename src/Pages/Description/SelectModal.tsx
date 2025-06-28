@@ -1,17 +1,18 @@
 import toast from "react-hot-toast";
 import { useContext, useState } from "react";
-import { calculateDaysRemaining, formatDate } from "../../Common/Utility";
 import { UserContext } from "../../Context/store";
 import { CHAIN_INFO, CONST } from "../../Common/constants";
 import { sendMsgs } from "../../Common/Utility/sendMsgs";
 // import CustomInput from "../../Common/Input/CustomInput";
 import { simulateMsgs } from "../../Common/Utility/simulateMsgs";
+import { calculateTimeRemaining, formatDate, getBalance } from "../../Common/Utility";
 import { MsgVote } from "../../proto-types-gen/src/cosmos/gov/v1beta1/tx";
 import { InfoIcon, Logo } from "../../Common/assets/StoreAsset/StoreAsset";
 
 
 function SelectModal(props: any) {
-  const { walletAddress, walletBalance } = useContext(UserContext);
+  const [btnDisable, setBtnDisable] = useState(true);
+  const { walletAddress } = useContext(UserContext);
   const [selectedOption, setSelectedOption] = useState<null | number>(null)
   const { data, close } = props;
 
@@ -23,22 +24,27 @@ function SelectModal(props: any) {
     switch (name) {
       case "yes":
         option = 1;
+        setBtnDisable(false);
         break;
 
       case "no":
         option = 3;
+        setBtnDisable(false);
         break;
 
       case "abstain":
         option = 2;
+        setBtnDisable(false);
         break;
 
       case "veto":
         option = 4;
+        setBtnDisable(false);
         break;
 
       default:
         option = 0;
+        setBtnDisable(true);
         break;
     }
 
@@ -52,10 +58,20 @@ function SelectModal(props: any) {
         toast.error("Please Select Option!");
         return;
       }
-      if (!walletBalance) {
-        toast.error("Insufficient funds!");
+
+       if (!walletAddress) {
+        toast.error("Please connect to wallet!");
         return;
       }
+
+      const balance = await getBalance(walletAddress)
+      
+      if (!balance) {
+        toast.error("Insufficient funds");
+        return;
+      }
+
+      setBtnDisable(true);
       const win: any = window;
       const key = await win.keplr.getKey(CHAIN_INFO.chainId);
       const protoMsgs = {
@@ -94,6 +110,7 @@ function SelectModal(props: any) {
           });
         toast.success("Vote successfully");
       }
+
     } catch (e) {
       console.log("error while voting", e);
       if (e instanceof Error) {
@@ -104,6 +121,7 @@ function SelectModal(props: any) {
     }
     close();
     setSelectedOption(null);
+    setBtnDisable(false);
   }
 
   return (
@@ -112,16 +130,16 @@ function SelectModal(props: any) {
         <InfoIcon />
         It will take 1 transactions
       </p>
-      <h3>{process.env?.REACT_APP_PROJECT_NAME ?? "" }</h3>
+      <h3>{process.env?.REACT_APP_PROJECT_NAME ?? ""}</h3>
+        {/* <Logo /> */}
       <div className="selectOptionModal_whitelist">
-        <Logo />
         <div>
           <h4>
             #{data?.proposalId}. <span>{data?.title}</span>
           </h4>
           <p>
             <span> {formatDate(data?.votingEndTime)}</span>
-            <span> ({calculateDaysRemaining(new Date(), data?.votingEndTime) ?? 0} days remaining)</span>
+            <span> ({calculateTimeRemaining(new Date(), data?.votingEndTime) ?? 0} remaining)</span>
           </p>
         </div>
       </div>
@@ -136,7 +154,7 @@ function SelectModal(props: any) {
         <CustomInput id="lname" name="lastname" placeholder="Enter memo" />
       </div> */}
       <div className="selectOptionModal_voteBtn">
-        <button className="commonBtn" onClick={handleVote}>Vote</button>
+        <button disabled={btnDisable} className="commonBtn" onClick={handleVote}>Vote</button>
       </div>
     </div>
   );
