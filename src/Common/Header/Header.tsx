@@ -28,7 +28,7 @@ function Header() {
           <div className="header-main_inner__left">
             <div className="svgLogo" onClick={(() => { navigate("/") })}>
               <img src={logo} alt="" />
-              <h3> {process.env.REACT_APP_PROJECT_NAME ?? ""} - Governance Proposal</h3>
+              <h3> {process.env.REACT_APP_PROJECT_NAME ?? ""} - Governance Portal</h3>
             </div>
           </div>
 

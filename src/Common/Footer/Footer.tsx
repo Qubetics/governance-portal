@@ -132,7 +132,7 @@ const Footer = () => {
           </Col>
         </Row>
         <p className="footernew_year">
-          © 2025 Copyright {process.env.REACT_APP_PROJECT_NAME ?? ""}. All rights reserved.
+          © {new Date()?.getFullYear() ?? 2025} Copyright {process.env.REACT_APP_PROJECT_NAME ?? ""}. All rights reserved.
         </p>
       </div>
     </section>
