@@ -15,7 +15,7 @@ jobs:
       ARGOCD_REPOSITORY: Qubetics/argocd-qubetics
       DEPLOYMENT_PATH: Governance-portal/governance-deployment.yaml
       HUAWEI_IMAGE: governance-portal
-      DOCKER_USERNAME: ap-southeast-1@BQG9INQF0BKVHSNQOLJG
+      DOCKER_USERNAME: ap-southeast-1@QHAEGIBURQMR6N4X3NQW
       ENV: ${{ vars.PROD_GOVERNANCE_PORTAL_ENV }}
     secrets:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
