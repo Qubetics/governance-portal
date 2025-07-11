@@ -72,6 +72,9 @@ export const simulateMsgs = async (
         tx_bytes: Buffer.from(unsignedTx).toString("base64"),
       })
     );
+
+    console.log("simulatedResult :", simulatedResult);
+    
     
     if (!simulatedResult?.error) {
       const gasUsed = parseInt(simulatedResult?.data?.gas_info.gas_used);
@@ -82,6 +85,8 @@ export const simulateMsgs = async (
       }
 
       return gasUsed;
+    }else{
+      return simulatedResult;
     }
   }
 

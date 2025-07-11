@@ -59,14 +59,13 @@ function SelectModal(props: any) {
         return;
       }
 
-       if (!walletAddress) {
+      if (!walletAddress) {
         toast.error("Please connect to wallet!");
         return;
       }
 
       const balance = await getBalance(walletAddress)
-      
-      if (!balance) {
+      if (!Number(balance ?? 0)) {
         toast.error("Insufficient funds");
         return;
       }
@@ -83,7 +82,7 @@ function SelectModal(props: any) {
         }).finish()
       }
 
-      const gasUsed = await simulateMsgs(
+      const gasUsed: any = await simulateMsgs(
         CHAIN_INFO,
         key.bech32Address,
         [protoMsgs],
@@ -93,8 +92,12 @@ function SelectModal(props: any) {
         }]
       );
 
-      console.log("gasUsed=========", gasUsed);
-      if (gasUsed) {
+      if (gasUsed?.error) {
+        if (typeof gasUsed?.data === "string" && gasUsed?.data.includes("unrecognized/unsupported public key type")) {
+          throw new Error("You’ll need to register yourself on the Qubetics network first");
+        }
+      } else {
+
         const win: any = window
         const data = await sendMsgs(
           win.keplr,
@@ -106,7 +109,7 @@ function SelectModal(props: any) {
               denom: CONST.currency.toLowerCase(),
               amount: "236",
             }],
-            gas: Math.floor(gasUsed * 1.8).toString(),
+            gas: Math.floor(Number(gasUsed ?? 0) * 1.8).toString(),
           });
         toast.success("Vote successfully");
       }
@@ -131,7 +134,7 @@ function SelectModal(props: any) {
         It will take 1 transactions
       </p>
       <h3>{process.env?.REACT_APP_PROJECT_NAME ?? ""}</h3>
-        {/* <Logo /> */}
+      {/* <Logo /> */}
       <div className="selectOptionModal_whitelist">
         <div>
           <h4>

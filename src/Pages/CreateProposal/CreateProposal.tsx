@@ -174,7 +174,7 @@ function CreateProposal() {
           }).finish(),
         };
 
-        const gasUsed = await simulateMsgs(
+        const gasUsed: any = await simulateMsgs(
           CHAIN_INFO,
           key.bech32Address,
           [sendMsg],
@@ -186,32 +186,43 @@ function CreateProposal() {
           ]
         );
 
-        console.log("gassUsed------", gasUsed);
+        if (gasUsed?.error) {
+          if (typeof gasUsed?.data === "string" && gasUsed?.data.includes("unrecognized/unsupported public key type")) {
+            throw new Error("You’ll need to register yourself on the Qubetics network first.")
 
-        if (gasUsed) {
-          await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
-            amount: [
-              {
-                denom: CONST.currency.toLowerCase(),
-                amount: "100000000",
-              },
-            ],
-            gas: Math.floor(gasUsed * 1.5).toString(),
-          });
-          toast.success("Proposal created successfully");
-          navigate("/")
+          }
         } else {
-          throw new Error("Something went wrong!");
+
+          if (gasUsed) {
+            await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
+              amount: [
+                {
+                  denom: CONST.currency.toLowerCase(),
+                  amount: "100000000",
+                },
+              ],
+              gas: Math.floor(Number(gasUsed ?? 0) * 1.5).toString(),
+            });
+            toast.success("Proposal created successfully");
+            navigate("/")
+          } else {
+            throw new Error("Something went wrong!");
+          }
+          setPropData({
+            title: "",
+            description: "",
+            deposit: "",
+          });
         }
-        setPropData({
-          title: "",
-          description: "",
-          deposit: "",
-        });
+
       }
 
     } catch (error) {
+
       if (error instanceof Error) {
+
+        console.log("Error msg: ", error?.message);
+
         toast.error(error?.message ?? "Something went wrong!");
       } else {
         toast.error("Something went wrong!");
@@ -293,7 +304,9 @@ function CreateProposal() {
       <div className="createProposal" onKeyDown={handleKeyDown}>
         <div className="container">
           <BackButton />
-          <h2 className="cardHeading">Create Proposal</h2>
+          <h2 className="cardHeading">Create Proposal <span style={{color:"gray"}}>
+            (You must be a validator, delegator, or hold over 1,000 TICS to proceed)
+          </span> </h2>
           <div className="cosmosSec">
             <div className="cosmosSec_inner">
               <div className="imgSec">
