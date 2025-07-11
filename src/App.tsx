@@ -2,6 +2,7 @@ import './App.css';
 import routes from './Routing/Routes';
 import { Toaster } from 'react-hot-toast';
 import { Context } from './Context/store';
+import SessionCheck from './SessionCheck';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
   return (
     <Context>
       <div className="App">
+        <SessionCheck />
         <RouterProvider router={router} />
         <Toaster />
       </div>

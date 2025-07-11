@@ -6,6 +6,7 @@ interface CommonModalProps {
   onClose: () => void;
   title: string;
   content: React.ReactNode;
+  customClass?: string;
 }
 
 const CommonModal: React.FC<CommonModalProps> = ({
@@ -13,6 +14,7 @@ const CommonModal: React.FC<CommonModalProps> = ({
   onClose,
   title,
   content,
+  customClass,
 }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const handleOk = () => {
@@ -27,13 +29,13 @@ const CommonModal: React.FC<CommonModalProps> = ({
   return (
     <Modal
       title={title}
-      visible={visible}
+      open={visible}
       onOk={handleOk}
       confirmLoading={confirmLoading}
       onCancel={onClose}
       centered
       footer={false}
-      className="commonModal"
+      className={`commonModal ${customClass}`}
     >
       {content}
     </Modal>
