@@ -1,4 +1,4 @@
-name: '[prod] Deploy governance portal'
+name: '[testnet] Deploy governance portal'
 
 on: 
   push:
