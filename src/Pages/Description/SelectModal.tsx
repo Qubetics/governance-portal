@@ -82,7 +82,7 @@ function SelectModal(props: any) {
         }).finish()
       }
 
-      const gasUsed: any = await simulateMsgs(
+      const gasFeeRes: any = await simulateMsgs(
         CHAIN_INFO,
         key.bech32Address,
         [protoMsgs],
@@ -92,14 +92,15 @@ function SelectModal(props: any) {
         }]
       );
 
-      if (gasUsed?.error) {
-        if (typeof gasUsed?.data === "string" && gasUsed?.data.includes("unrecognized/unsupported public key type")) {
+      if (gasFeeRes?.error) {
+        if (typeof gasFeeRes?.data === "string" && gasFeeRes?.data.includes("unrecognized/unsupported public key type")) {
           throw new Error("You’ll need to register yourself on the Qubetics network first");
+        } else {
+          throw new Error("Something went wrong!")
         }
       } else {
-
         const win: any = window
-        const data = await sendMsgs(
+        await sendMsgs(
           win.keplr,
           CHAIN_INFO,
           key.bech32Address,
@@ -109,18 +110,15 @@ function SelectModal(props: any) {
               denom: CONST.currency.toLowerCase(),
               amount: "236",
             }],
-            gas: Math.floor(Number(gasUsed ?? 0) * 1.8).toString(),
+            gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.8).toString(),
           });
         toast.success("Vote successfully");
       }
 
-    } catch (e) {
-      console.log("error while voting", e);
-      if (e instanceof Error) {
-        toast.error(e.message);
-      } else {
-        toast.error("Something went wrong!");
-      }
+    } catch (e: any) {
+      console.log("error while voting: ", e);
+
+      toast.error(e.message ?? "Something went wrong!");
     }
     close();
     setSelectedOption(null);

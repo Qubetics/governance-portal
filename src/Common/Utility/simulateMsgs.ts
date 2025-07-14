@@ -1,5 +1,3 @@
-import { ChainInfo } from "@keplr-wallet/types";
-import { Any } from "../../proto-types-gen/src/google/protobuf/any";
 import {
   Fee,
   TxRaw,
@@ -7,12 +5,12 @@ import {
   AuthInfo,
   SignerInfo,
 } from "../../proto-types-gen/src/cosmos/tx/v1beta1/tx";
-
-import { SignMode } from "../../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing";
-import { fetchAccountInfo } from "./sendMsgs";
-import { httpReqest } from "../httpRequest";
-import { GasSimulateResponse } from "../types/simulate";
 import { CHAIN_INFO } from "../constants";
+import { httpReqest } from "../httpRequest";
+import { fetchAccountInfo } from "./sendMsgs";
+import { ChainInfo } from "@keplr-wallet/types";
+import { Any } from "../../proto-types-gen/src/google/protobuf/any";
+import { SignMode } from "../../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing";
 
 export const simulateMsgs = async (
   chainInfo: ChainInfo,
@@ -27,7 +25,7 @@ export const simulateMsgs = async (
   memo: string = ""
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
-  
+
   if (account) {
     const unsignedTx = TxRaw.encode({
       bodyBytes: TxBody.encode(
@@ -73,9 +71,6 @@ export const simulateMsgs = async (
       })
     );
 
-    console.log("simulatedResult :", simulatedResult);
-    
-    
     if (!simulatedResult?.error) {
       const gasUsed = parseInt(simulatedResult?.data?.gas_info.gas_used);
       if (Number.isNaN(gasUsed)) {
@@ -84,8 +79,12 @@ export const simulateMsgs = async (
         );
       }
 
-      return gasUsed;
-    }else{
+      return {
+        error: simulatedResult?.error,
+        status: simulatedResult?.status,
+        gasUsed: gasUsed,
+      };
+    } else {
       return simulatedResult;
     }
   }

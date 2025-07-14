@@ -135,15 +135,11 @@ function CreateProposal() {
         toast.error("Please connect to wallet!");
         return;
       }
-
       const balance = await getBalance(walletAddress)
-      console.log("balance: ", balance);
-
       if (+propData?.deposit > Number(balance ?? 0)) {
         toast.error("Insufficient funds");
         return;
       }
-
 
       if (!inputValidation()) {
         setBtnDisabled(true)
@@ -167,14 +163,14 @@ function CreateProposal() {
             initialDeposit: [
               {
                 denom: CONST.currency.toLowerCase(),
-                amount: `${Number(propData?.deposit) * 10 ** 18}`,
+                amount: noExponent(Number(propData?.deposit) * 10 ** 18),
               },
             ],
             proposer: key.bech32Address,
           }).finish(),
         };
 
-        const gasUsed: any = await simulateMsgs(
+        const gasFeeRes: any = await simulateMsgs(
           CHAIN_INFO,
           key.bech32Address,
           [sendMsg],
@@ -186,50 +182,37 @@ function CreateProposal() {
           ]
         );
 
-        if (gasUsed?.error) {
-          if (typeof gasUsed?.data === "string" && gasUsed?.data.includes("unrecognized/unsupported public key type")) {
-            throw new Error("You’ll need to register yourself on the Qubetics network first.")
-
+        if (gasFeeRes?.error) {
+          if (typeof gasFeeRes?.data === "string" && gasFeeRes?.data.includes("unrecognized/unsupported public key type")) {
+            throw new Error("You’ll need to register yourself on the " + CONST.chainName + " network first.")
+          } else {
+            throw new Error("Something went wrong!")
           }
         } else {
-
-          if (gasUsed) {
-            await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
-              amount: [
-                {
-                  denom: CONST.currency.toLowerCase(),
-                  amount: "100000000",
-                },
-              ],
-              gas: Math.floor(Number(gasUsed ?? 0) * 1.5).toString(),
-            });
-            toast.success("Proposal created successfully");
-            navigate("/")
-          } else {
-            throw new Error("Something went wrong!");
-          }
+          await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
+            amount: [
+              {
+                denom: CONST.currency.toLowerCase(),
+                amount: "100000000",
+              },
+            ],
+            gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.5).toString(),
+          });
+          toast.success("Proposal created successfully");
+          navigate("/")
           setPropData({
             title: "",
             description: "",
             deposit: "",
           });
         }
-
       }
 
-    } catch (error) {
-
-      if (error instanceof Error) {
-
-        console.log("Error msg: ", error?.message);
-
-        toast.error(error?.message ?? "Something went wrong!");
-      } else {
-        toast.error("Something went wrong!");
-      }
+    } catch (error: any) {
+      toast.error(error?.message ?? "Something went wrong!");
       console.log("error while creating proposal : ", error);
     } finally {
-      setBtnDisabled(false)
+      setBtnDisabled(false);
     }
   }
 
@@ -304,9 +287,7 @@ function CreateProposal() {
       <div className="createProposal" onKeyDown={handleKeyDown}>
         <div className="container">
           <BackButton />
-          <h2 className="cardHeading">Create Proposal <span style={{color:"gray"}}>
-            (You must be a validator, delegator, or hold over 1,000 TICS to proceed)
-          </span> </h2>
+          <h2 className="cardHeading">Create Proposal</h2>
           <div className="cosmosSec">
             <div className="cosmosSec_inner">
               <div className="imgSec">

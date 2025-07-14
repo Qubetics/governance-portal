@@ -1,19 +1,20 @@
 import "./Header.scss";
 import { Button } from "antd";
 import logo from "../../logo.svg";
-import { useContext, useEffect, useState } from "react";
+import { CONST } from "../constants";
 import { useNavigate } from 'react-router-dom';
-import CommonModal from "../commonModal/CommonModal";
-import { CopyIcon } from "../assets/StoreAsset/StoreAsset";
-import { copyToClipBoard, formatString } from "../Utility";
 import { UserContext } from "../../Context/store";
+import CommonModal from "../commonModal/CommonModal";
+import { useContext, useEffect, useState } from "react";
+import { CopyIcon } from "../assets/StoreAsset/StoreAsset";
+import { copyToClipBoard, formatString, noExponent } from "../Utility";
 
 function Header() {
   const navigate = useNavigate();
-  const { walletAddress, setWalletAddress, setWallet } = useContext(UserContext);
   const [address, setAddress] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const { walletAddress, walletBalance, setWalletAddress, setWallet } = useContext(UserContext);
 
   const showLogoutModal = () => {
     setIsModalVisible(true);
@@ -75,7 +76,7 @@ function Header() {
               >
                 <div className="copyBtns">
                   {formatString(address)}
-                  <text
+                  <span
                     className="copy-btn"
                     style={{ cursor: "pointer", zIndex: "9999" }}
                   >
@@ -85,10 +86,34 @@ function Header() {
                     >
                       <CopyIcon />
                     </span>
-                  </text>
+                  </span>
                 </div>
               </button>
 
+              <button
+                color="primary"
+                className="headermetaBtn"
+              >
+                <div className="copyBtns">
+                  Balance : {
+                    (walletBalance
+                      ? Number(walletBalance).toFixed(2)
+                      : 0)
+                    ?? "-"
+                  } {CONST.currency}
+                  <span
+                    className="copy-btn"
+                    style={{ cursor: "pointer", zIndex: "9999" }}
+                  >
+                    <span
+                      className="pointer"
+                      onClick={() => copyToClipBoard(walletBalance?.toString() ?? "")}
+                    >
+                      <CopyIcon />
+                    </span>
+                  </span>
+                </div>
+              </button>
 
               <Button className="btns headermetaBtn" onClick={showLogoutModal}>
                 <div
@@ -113,7 +138,6 @@ function Header() {
                   </div>
                 }
               />
-
             </div>
           }
         </div>

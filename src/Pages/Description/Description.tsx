@@ -240,12 +240,6 @@ function Description() {
             <h2 className="cardHeading">
               #{id}. {propData?.title}
             </h2>
-            {
-              propData?.status === "voting" &&
-              <div className="cardHeading" style={{ color: "gray" }}>
-                To vote, you must be a validator or delegator
-              </div>
-            }
             <div className="votingProgress">
               <div className="wallet">
                 {propData?.status === "rejected" ? (

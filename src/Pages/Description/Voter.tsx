@@ -1,11 +1,12 @@
 import "./Description.scss";
 import toast from "react-hot-toast";
-import React, { useEffect, useState } from "react";
+import { UserContext } from "../../Context/store";
 import NoData from "../../Common/assets/no-data.png"
+import { useEffect, useState, useContext } from "react";
 import { httpReqest } from "../../Common/httpRequest";
 import { CHAIN_INFO, CONST } from "../../Common/constants";
-import { copyToClipBoard, formatString, noExponent } from "../../Common/Utility";
 import { Empty, Input, Modal, Progress, Table, Tabs, TabsProps } from "antd";
+import { copyToClipBoard, formatString, noExponent } from "../../Common/Utility";
 import { CopyIcon, Searchicon } from "../../Common/assets/StoreAsset/StoreAsset";
 
 function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
@@ -28,7 +29,9 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
   const [abstainPercentage, setAbstainPercentage] = useState(0);
 
   const [searchedVal, setSearchedVal] = useState("");
+  const { walletAddress } = useContext(UserContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [tabData, setTabData] = useState<{
     yes: number | string;
     no: number | string;
@@ -104,12 +107,10 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const closeModal = () => {
     setIsModalOpen(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalOpen(false);
+    setSearchedVal("");
+    setCurrentTab(1)
   };
 
   /**
@@ -261,7 +262,7 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
    */
   const handleSearch = async () => {
     try {
-      if (searchedVal?.length !== 44) {
+      if (walletAddress?.length !== searchedVal?.length || searchedVal?.length !== 47) {
         toast.error("Please enter correct address for search!");
         return;
       }
@@ -579,8 +580,8 @@ function Voter({ propId, tallyData }: { propId: any; tallyData: any }) {
         <Modal
           title="Recent Voters"
           open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
+          onOk={closeModal}
+          onCancel={closeModal}
           className="cmnModal voterModal"
           footer={null}
         >
