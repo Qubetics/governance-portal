@@ -330,16 +330,16 @@ function Description() {
         title="Connect Wallet"
         content={
           <>
-          <div className="keplerContent" onClick={connectWallet}>
-            <img src={keplr} alt="keplr" />
-            <div style={{ cursor: "pointer" }}>
-              <h4>keplr</h4>
+            <div className="keplerContent" onClick={connectWallet}>
+              <img src={keplr} alt="keplr" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>keplr</h4>
+              </div>
             </div>
-          </div>
-              <p style={{color: "#fff"}}>
-               Note: If you use keplr Wallet, you will have access to all features
-              </p>
-              </>
+            <p style={{ color: "#fff" }}>
+              Note: If you use keplr Wallet, you will have access to all features
+            </p>
+          </>
         }
       />
       <CommonModal

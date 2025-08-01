@@ -2,6 +2,7 @@ import { Dec } from "@keplr-wallet/unit";
 import { CHAIN_INFO } from "../Common/constants";
 import { httpReqest } from "../Common/httpRequest";
 import { useState, createContext, useEffect, ReactNode } from "react";
+import { getBalance } from "../Common/Utility";
 
 interface UserContextType {
     wallet: any | null;
@@ -10,7 +11,7 @@ interface UserContextType {
     setWalletAddress: React.Dispatch<React.SetStateAction<any | null>>;
     isWallet: boolean;
     setIsWallet: React.Dispatch<React.SetStateAction<boolean>>;
-    // walletBalance: number | string | null;
+    walletBalance: number | string | null;
     // setWalletBalance: React.Dispatch<React.SetStateAction<number | string | null>>;
     votingWidgetsData: any;
     setVotingWidgets: React.Dispatch<React.SetStateAction<any>>;
@@ -23,7 +24,7 @@ const defaultValue: UserContextType = {
     setWalletAddress: () => { },
     isWallet: false,
     setIsWallet: () => { },
-    // walletBalance: null,
+    walletBalance: null,
     // setWalletBalance: () => { },
     votingWidgetsData: null,
     setVotingWidgets: () => { },
@@ -38,8 +39,15 @@ interface ContextProps {
 export function Context(props: ContextProps) {
     const [wallet, setWallet] = useState<any | null>(localStorage.getItem("wltConnected"));
     const [isWallet, setIsWallet] = useState<boolean>(false);
+    const [walletBalance, setWalletBalance] = useState<number | string>(0);
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [votingWidgetsData, setVotingWidgets] = useState<any>(null);
+
+
+    const fetchBalance = async (address: string) => {
+        const balance = await getBalance(address);
+        setWalletBalance(Number(balance));
+    }
 
     useEffect(() => {
 
@@ -47,7 +55,8 @@ export function Context(props: ContextProps) {
         const address = localStorage.getItem("wltAddress");
 
         if (address) {
-            setWalletAddress(address)
+            setWalletAddress(address);
+            fetchBalance(address);
         }
 
         console.log("value:  ", value);
@@ -57,7 +66,6 @@ export function Context(props: ContextProps) {
         } else {
             setIsWallet(false);
         }
-
 
     }, []);
 
@@ -75,6 +83,7 @@ export function Context(props: ContextProps) {
         setWallet,
         isWallet,
         setIsWallet,
+        walletBalance,
         walletAddress,
         setWalletAddress,
         votingWidgetsData,

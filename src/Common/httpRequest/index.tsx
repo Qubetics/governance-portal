@@ -13,11 +13,13 @@ export const httpReqest = async (url: string, method: 'GET' | 'POST' | 'PUT' | '
         }
 
     } catch (error: any) {
+        console.log("Error : ", error?.response?.data?.message);
+
         const status = error?.response?.status;
         return {
             error: true,
             status: status,
-            data: null,
+            data: error?.response?.data?.message ?? error?.message ?? null,
         }
     }
 }

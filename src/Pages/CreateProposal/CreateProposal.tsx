@@ -135,15 +135,11 @@ function CreateProposal() {
         toast.error("Please connect to wallet!");
         return;
       }
-
       const balance = await getBalance(walletAddress)
-      console.log("balance: ", balance);
-
       if (+propData?.deposit > Number(balance ?? 0)) {
         toast.error("Insufficient funds");
         return;
       }
-
 
       if (!inputValidation()) {
         setBtnDisabled(true)
@@ -167,14 +163,14 @@ function CreateProposal() {
             initialDeposit: [
               {
                 denom: CONST.currency.toLowerCase(),
-                amount: `${Number(propData?.deposit) * 10 ** 18}`,
+                amount: noExponent(Number(propData?.deposit) * 10 ** 18),
               },
             ],
             proposer: key.bech32Address,
           }).finish(),
         };
 
-        const gasUsed = await simulateMsgs(
+        const gasFeeRes: any = await simulateMsgs(
           CHAIN_INFO,
           key.bech32Address,
           [sendMsg],
@@ -186,9 +182,13 @@ function CreateProposal() {
           ]
         );
 
-        console.log("gassUsed------", gasUsed);
-
-        if (gasUsed) {
+        if (gasFeeRes?.error) {
+          if (typeof gasFeeRes?.data === "string" && gasFeeRes?.data.includes("unrecognized/unsupported public key type")) {
+            throw new Error("You’ll need to register yourself on the " + CONST.chainName + " network first.")
+          } else {
+            throw new Error("Something went wrong!")
+          }
+        } else {
           await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
             amount: [
               {
@@ -196,29 +196,23 @@ function CreateProposal() {
                 amount: "100000000",
               },
             ],
-            gas: Math.floor(gasUsed * 1.5).toString(),
+            gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.5).toString(),
           });
           toast.success("Proposal created successfully");
           navigate("/")
-        } else {
-          throw new Error("Something went wrong!");
+          setPropData({
+            title: "",
+            description: "",
+            deposit: "",
+          });
         }
-        setPropData({
-          title: "",
-          description: "",
-          deposit: "",
-        });
       }
 
-    } catch (error) {
-      if (error instanceof Error) {
-        toast.error(error?.message ?? "Something went wrong!");
-      } else {
-        toast.error("Something went wrong!");
-      }
+    } catch (error: any) {
+      toast.error(error?.message ?? "Something went wrong!");
       console.log("error while creating proposal : ", error);
     } finally {
-      setBtnDisabled(false)
+      setBtnDisabled(false);
     }
   }
 
