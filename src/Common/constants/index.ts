@@ -23,7 +23,23 @@ export const FOOTER_LINK: {
   telegram: string;
   instagram: string;
   github: string;
-} = JSON.parse(process.env.REACT_APP_FOOTER_LINKS ?? "{}");
+} = {
+  validator: process.env.REACT_APP_VALIDATOR || "",
+  explorer: process.env.REACT_APP_EXPLORER || "",
+  delegator: process.env.REACT_APP_DELEGATOR || "",
+  qubeQode: process.env.REACT_APP_QUBE_QODE || "",
+  privacyPolicy: process.env.REACT_APP_PRIVACY_POLICY || "",
+  terms: process.env.REACT_APP_TERMS || "",
+  ide: process.env.REACT_APP_IDE || "",
+  officialWebsite: process.env.REACT_APP_OFFICIAL_WEBSITE || "",
+  networkDoc: process.env.REACT_APP_NETWORK_DOCS || "",
+  documentation: process.env.REACT_APP_DOCUMENTATION || "",
+  twitter: process.env.REACT_APP_TWITTER || "",
+  facebook: process.env.REACT_APP_FACEBOOK || "",
+  telegram: process.env.REACT_APP_TELEGRAM || "",
+  instagram:process.env.REACT_APP_INSTAGRAM || "",
+  github: process.env.REACT_APP_GITHUB || "",
+};
 
 export const CHAIN_INFO: ChainInfo = {
   // Chain-id of the Osmosis chain.
