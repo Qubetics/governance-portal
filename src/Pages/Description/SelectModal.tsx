@@ -5,19 +5,22 @@ import { CHAIN_INFO, CONST } from "../../Common/constants";
 import { sendMsgs } from "../../Common/Utility/sendMsgs";
 // import CustomInput from "../../Common/Input/CustomInput";
 import { simulateMsgs } from "../../Common/Utility/simulateMsgs";
-import { calculateTimeRemaining, formatDate, getBalance } from "../../Common/Utility";
+import {
+  calculateTimeRemaining,
+  formatDate,
+  getBalance,
+  getWalletProvider,
+} from "../../Common/Utility";
 import { MsgVote } from "../../proto-types-gen/src/cosmos/gov/v1beta1/tx";
 import { InfoIcon, Logo } from "../../Common/assets/StoreAsset/StoreAsset";
-
 
 function SelectModal(props: any) {
   const [btnDisable, setBtnDisable] = useState(true);
   const { walletAddress } = useContext(UserContext);
-  const [selectedOption, setSelectedOption] = useState<null | number>(null)
+  const [selectedOption, setSelectedOption] = useState<null | number>(null);
   const { data, close } = props;
 
   async function handleOptions(e: any) {
-
     const name = e.target.name;
     let option: number;
 
@@ -49,7 +52,6 @@ function SelectModal(props: any) {
     }
 
     setSelectedOption(option);
-
   }
 
   async function handleVote() {
@@ -64,57 +66,60 @@ function SelectModal(props: any) {
         return;
       }
 
-      const balance = await getBalance(walletAddress)
+      const balance = await getBalance(walletAddress);
       if (!Number(balance ?? 0)) {
         toast.error("Insufficient funds");
         return;
       }
 
       setBtnDisable(true);
-      const win: any = window;
-      const key = await win.keplr.getKey(CHAIN_INFO.chainId);
+      const provider = getWalletProvider();
+      const key = await provider.getKey(CHAIN_INFO.chainId);
       const protoMsgs = {
         typeUrl: "/cosmos.gov.v1beta1.MsgVote",
         value: MsgVote.encode({
           proposalId: `${data?.proposalId}`,
           voter: walletAddress as string,
           option: selectedOption ?? 0,
-        }).finish()
-      }
+        }).finish(),
+      };
 
       const gasFeeRes: any = await simulateMsgs(
         CHAIN_INFO,
         key.bech32Address,
         [protoMsgs],
-        [{
-          denom: CONST.currency.toLowerCase(),
-          amount: "236"
-        }]
+        [
+          {
+            denom: CONST.currency.toLowerCase(),
+            amount: "236",
+          },
+        ],
       );
 
       if (gasFeeRes?.error) {
-        if (typeof gasFeeRes?.data === "string" && gasFeeRes?.data.includes("unrecognized/unsupported public key type")) {
-          throw new Error("You’ll need to register yourself on the Qubetics network first");
+        if (
+          typeof gasFeeRes?.data === "string" &&
+          gasFeeRes?.data.includes("unrecognized/unsupported public key type")
+        ) {
+          throw new Error(
+            "You’ll need to register yourself on the Qubetics network first",
+          );
         } else {
-          throw new Error("Something went wrong!")
+          throw new Error("Something went wrong!");
         }
       } else {
-        const win: any = window
-        await sendMsgs(
-          win.keplr,
-          CHAIN_INFO,
-          key.bech32Address,
-          [protoMsgs],
-          {
-            amount: [{
+        const provider = getWalletProvider();
+        await sendMsgs(provider, CHAIN_INFO, key.bech32Address, [protoMsgs], {
+          amount: [
+            {
               denom: CONST.currency.toLowerCase(),
               amount: "236",
-            }],
-            gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.8).toString(),
-          });
+            },
+          ],
+          gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.8).toString(),
+        });
         toast.success("Vote successfully");
       }
-
     } catch (e: any) {
       console.log("error while voting: ", e);
 
@@ -140,22 +145,61 @@ function SelectModal(props: any) {
           </h4>
           <p>
             <span> {formatDate(data?.votingEndTime)}</span>
-            <span> ({calculateTimeRemaining(new Date(), data?.votingEndTime) ?? 0} remaining)</span>
+            <span>
+              {" "}
+              ({calculateTimeRemaining(new Date(), data?.votingEndTime) ??
+                0}{" "}
+              remaining)
+            </span>
           </p>
         </div>
       </div>
       <div className="selectOptionModal_buttons multioptionBtn">
-        <button className={`grayBtn ${selectedOption === 1 ? "borderBlue" : ""}`} name="yes" onClick={handleOptions} value="yes">Yes</button>
-        <button className={`grayBtn ${selectedOption === 3 ? "borderBlue" : ""}`} name="no" onClick={handleOptions} value="no" >No</button>
-        <button className={`grayBtn  ${selectedOption === 4 ? "borderBlue" : ""}`} name="veto" onClick={handleOptions} value="veto">Veto</button>
-        <button className={`grayBtn  ${selectedOption === 2 ? "borderBlue" : ""}`} name="abstain" onClick={handleOptions} value="abstain">Abstain</button>
+        <button
+          className={`grayBtn ${selectedOption === 1 ? "borderBlue" : ""}`}
+          name="yes"
+          onClick={handleOptions}
+          value="yes"
+        >
+          Yes
+        </button>
+        <button
+          className={`grayBtn ${selectedOption === 3 ? "borderBlue" : ""}`}
+          name="no"
+          onClick={handleOptions}
+          value="no"
+        >
+          No
+        </button>
+        <button
+          className={`grayBtn  ${selectedOption === 4 ? "borderBlue" : ""}`}
+          name="veto"
+          onClick={handleOptions}
+          value="veto"
+        >
+          Veto
+        </button>
+        <button
+          className={`grayBtn  ${selectedOption === 2 ? "borderBlue" : ""}`}
+          name="abstain"
+          onClick={handleOptions}
+          value="abstain"
+        >
+          Abstain
+        </button>
       </div>
       {/* <div className="selectOptionModal_optionalMemo">
         <h4>Memo (Optional)</h4>
         <CustomInput id="lname" name="lastname" placeholder="Enter memo" />
       </div> */}
       <div className="selectOptionModal_voteBtn">
-        <button disabled={btnDisable} className="commonBtn" onClick={handleVote}>Vote</button>
+        <button
+          disabled={btnDisable}
+          className="commonBtn"
+          onClick={handleVote}
+        >
+          Vote
+        </button>
       </div>
     </div>
   );

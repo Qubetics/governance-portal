@@ -1,30 +1,30 @@
-import Long from "long";
-import { Buffer } from "buffer";
-import { httpReqest } from "../httpRequest";
-import { AccountResponse } from "../types/account";
 import { TendermintTxTracer } from "@keplr-wallet/cosmos";
-import { Any } from "../../proto-types-gen/src/google/protobuf/any";
-import { BroadcastMode, ChainInfo, Keplr, StdFee } from "@keplr-wallet/types";
+import { BroadcastMode, ChainInfo, StdFee } from "@keplr-wallet/types";
+import { Buffer } from "buffer";
+import Long from "long";
 import { PubKey } from "../../proto-types-gen/src/cosmos/crypto/secp256k1/keys";
 import { SignMode } from "../../proto-types-gen/src/cosmos/tx/signing/v1beta1/signing";
 import {
-  Fee,
-  TxRaw,
-  TxBody,
   AuthInfo,
+  Fee,
+  TxBody,
+  TxRaw,
 } from "../../proto-types-gen/src/cosmos/tx/v1beta1/tx";
-import toast from "react-hot-toast";
+import { Any } from "../../proto-types-gen/src/google/protobuf/any";
+import { httpReqest } from "../httpRequest";
+import { getWalletProvider } from "./index";
 
 export const sendMsgs = async (
-  keplr: Keplr,
+  wallet: any,
   chainInfo: ChainInfo,
   sender: string,
   proto: Any[],
   fee: StdFee,
-  memo: string = ""
+  memo: string = "",
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
-  const { pubKey } = await keplr.getKey(chainInfo.chainId);
+  const provider = wallet || getWalletProvider();
+  const { pubKey } = await provider.getKey(chainInfo.chainId);
 
   if (account) {
     const signDoc = {
@@ -32,7 +32,7 @@ export const sendMsgs = async (
         TxBody.fromPartial({
           messages: proto,
           memo,
-        })
+        }),
       ).finish(),
       authInfoBytes: AuthInfo.encode({
         signerInfos: [
@@ -66,7 +66,11 @@ export const sendMsgs = async (
       accountNumber: Long.fromString(account.account_number),
     };
 
-    const signed = await keplr.signDirect(chainInfo.chainId, sender, signDoc);
+    const signed = await provider.signDirect(
+      chainInfo.chainId,
+      sender,
+      signDoc,
+    );
 
     const signedTx = {
       tx: TxRaw.encode({
@@ -77,8 +81,11 @@ export const sendMsgs = async (
       }).finish(),
       signDoc: signed.signed,
     };
-
-    const txHash = await broadcastTxSync(keplr, chainInfo.chainId, signedTx.tx);
+    const txHash = await broadcastTxSync(
+      provider,
+      chainInfo.chainId,
+      signedTx.tx,
+    );
     const txTracer = new TendermintTxTracer(chainInfo.rpc, "/websocket");
     txTracer.traceTx(txHash).then((tx: any) => {
       console.log("tx  : ", tx);
@@ -89,7 +96,7 @@ export const sendMsgs = async (
 
 export const fetchAccountInfo = async (
   chainInfo: ChainInfo,
-  address: string
+  address: string,
 ) => {
   try {
     const uri = `${chainInfo.rest}/cosmos/auth/v1beta1/accounts/${address}`;
@@ -100,16 +107,16 @@ export const fetchAccountInfo = async (
     return null;
   } catch (e) {
     console.error(
-      "This may be a new account. Please send some tokens to this account first."
+      "This may be a new account. Please send some tokens to this account first.",
     );
     return undefined;
   }
 };
 
 export const broadcastTxSync = async (
-  keplr: Keplr,
+  wallet: any,
   chainId: string,
-  tx: Uint8Array
+  tx: Uint8Array,
 ): Promise<Uint8Array> => {
-  return keplr.sendTx(chainId, tx, "sync" as BroadcastMode);
+  return wallet.sendTx(chainId, tx, "sync" as BroadcastMode);
 };

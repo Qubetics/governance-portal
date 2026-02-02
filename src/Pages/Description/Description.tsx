@@ -1,32 +1,35 @@
-import "../../index.scss";
-import Voter from "./Voter";
-import "./Description.scss";
-import Details from "./Details";
-import toast from "react-hot-toast";
-import { Progress, Tabs } from "antd";
 import type { TabsProps } from "antd";
-import SelectModal from "./SelectModal";
-import { useParams } from "react-router";
-import { Dec } from "@keplr-wallet/unit";
-import DescriptionCard from "./DescriptionCard";
-import { UserContext } from "../../Context/store";
-import keplr from "../../Common/assets/keplr.svg";
-import TransactionDModal from "./TransactionDModal";
-import DescriptionSummary from "./DescriptionSummary";
-import { httpReqest } from "../../Common/httpRequest";
+import { Progress, Tabs } from "antd";
 import { useContext, useEffect, useState } from "react";
-import { CHAIN_INFO, CONST } from "../../Common/constants";
+import { useParams } from "react-router";
+import toast from "react-hot-toast";
+import keplr from "../../Common/assets/keplr.svg";
+import cosmostation from "../../Common/assets/cosmostation.svg";
+import logo from "../../logo.svg";
+import { Vooting } from "../../Common/assets/StoreAsset/StoreAsset";
 import BackButton from "../../Common/BackButton/BackButton";
 import CommonModal from "../../Common/commonModal/CommonModal";
-import { Vooting } from "../../Common/assets/StoreAsset/StoreAsset";
+import { CHAIN_INFO, CONST } from "../../Common/constants";
+import { httpReqest } from "../../Common/httpRequest";
 import {
+  calculateElapsedTimePercentage,
+  calculateTimeRemaining,
+  ensureCosmostationConnected,
+  ensureKeplrConnected,
+  ensureQubeticsConnected,
+  flooreDecimals,
   formatDate,
   noExponent,
-  flooreDecimals,
-  calculateTimeRemaining,
-  calculateElapsedTimePercentage,
-  ensureKeplrConnected,
 } from "../../Common/Utility";
+import { UserContext } from "../../Context/store";
+import "../../index.scss";
+import "./Description.scss";
+import DescriptionCard from "./DescriptionCard";
+import DescriptionSummary from "./DescriptionSummary";
+import Details from "./Details";
+import SelectModal from "./SelectModal";
+import TransactionDModal from "./TransactionDModal";
+import Voter from "./Voter";
 
 function Description() {
   const { id } = useParams();
@@ -44,6 +47,8 @@ function Description() {
     setWalletAddress,
     walletAddress,
     votingWidgetsData,
+    setWalletType,
+    setEvmAddress,
   } = useContext(UserContext);
   const [progressPercentage, setProgressPercentage] = useState<any>(0);
 
@@ -93,15 +98,19 @@ function Description() {
       const bondedRes = await httpReqest(
         CHAIN_INFO.rest + "/cosmos/staking/v1beta1/pool",
         "GET",
-        null
+        null,
       );
 
       bondedT = Number(bondedRes?.data?.pool?.bonded_tokens ?? 0);
 
       const res = await httpReqest(
-        process.env.REACT_APP_BACKEND_URL + "/" + CONST.chainName.toLowerCase() + "/proposals/id/" + id,
+        process.env.REACT_APP_BACKEND_URL +
+          "/" +
+          CONST.chainName.toLowerCase() +
+          "/proposals/id/" +
+          id,
         "GET",
-        null
+        null,
       );
 
       if (!res?.error) {
@@ -111,27 +120,27 @@ function Description() {
         const tallyKey = {
           yes: tally?.yes_count
             ? noExponent(
-              Number(tally?.yes_count) /
-              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-            )
+                Number(tally?.yes_count) /
+                  10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18),
+              )
             : 0,
           no: tally?.no_count
             ? noExponent(
-              Number(tally?.no_count) /
-              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-            )
+                Number(tally?.no_count) /
+                  10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18),
+              )
             : 0,
           veto: tally?.no_with_veto_count
             ? noExponent(
-              Number(tally?.no_with_veto_count) /
-              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-            )
+                Number(tally?.no_with_veto_count) /
+                  10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18),
+              )
             : 0,
           abstain: tally?.abstain_count
             ? noExponent(
-              Number(tally?.abstain_count) /
-              10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18)
-            )
+                Number(tally?.abstain_count) /
+                  10 ** Number(CHAIN_INFO?.stakeCurrency?.coinDecimals ?? 18),
+              )
             : 0,
         };
 
@@ -139,7 +148,7 @@ function Description() {
 
         const percentageElapsed = calculateElapsedTimePercentage(
           res.data?.data?.proposal?.votingStartTime,
-          res.data?.data?.proposal?.votingEndTime
+          res.data?.data?.proposal?.votingEndTime,
         );
 
         totalTally =
@@ -195,7 +204,7 @@ function Description() {
     } catch (error) {
       console.log("erorr while fething or setting up api data ", error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchProposal();
@@ -219,14 +228,26 @@ function Description() {
     },
   ];
 
-  async function connectWallet() {
-    const data = await ensureKeplrConnected();
+  async function connectWallet(type: string) {
+    let data;
+    if (type === "keplr") {
+      data = await ensureKeplrConnected();
+    } else if (type === "cosmostation") {
+      data = await ensureCosmostationConnected();
+    } else {
+      data = await ensureQubeticsConnected();
+    }
 
-    if (data?.address) {
+    if (data?.connected && data?.address) {
       setIsWallet(true);
       setWalletAddress(data?.address);
+      setWalletType(type);
+      if (data?.evmAddress) {
+        setEvmAddress(data.evmAddress);
+      }
       localStorage.setItem("wltConnected", "true");
       localStorage.setItem("wltAddress", data?.address);
+      localStorage.setItem("wltType", type);
     }
     handleKeplrModal();
   }
@@ -249,26 +270,18 @@ function Description() {
                     <Vooting />
                     Voting in progress
                   </h2>
-                ) :
-                  propData?.status === "voting" ?
-                    (
-                      <h2 className="green">Passed</h2>
-                    )
-                    : ""
-                }
+                ) : propData?.status === "voting" ? (
+                  <h2 className="green">Passed</h2>
+                ) : (
+                  ""
+                )}
                 {propData?.status === "voting" ? (
                   walletAddress && isWallet ? (
-                    <button
-                      className="commonBtn"
-                      onClick={handleVotingModal}
-                    >
+                    <button className="commonBtn" onClick={handleVotingModal}>
                       Vote
                     </button>
                   ) : (
-                    <button
-                      className="commonBtn"
-                      onClick={handleKeplrModal}
-                    >
+                    <button className="commonBtn" onClick={handleKeplrModal}>
                       Connect Wallet
                     </button>
                   )
@@ -286,36 +299,38 @@ function Description() {
                   %
                 </h2>
               </div>
-              {
-                !(turnout >= 50) &&
+              {!(turnout >= 50) && (
                 <div className="threeHold">
                   <ul>
-                    <li>Threshold not reached ( {turnout ? flooreDecimals(turnout, 5) : 0}% / 50.0% )</li>
+                    <li>
+                      Threshold not reached ({" "}
+                      {turnout ? flooreDecimals(turnout, 5) : 0}% / 50.0% )
+                    </li>
                   </ul>
                 </div>
-              }
+              )}
               <DescriptionCard data={tallyData} />
-              {
-                propData?.status === "voting" ?
-                  <div className="progressDescription">
-                    <div className="topHeading">
-                      <h3>Progress</h3>
-                      <p>
-                        {calculateTimeRemaining(
-                          new Date(),
-                          propData?.votingEndTime
-                        )}{" "}
-                        remaining
-                      </p>
-                    </div>
-                    <Progress percent={progressPercentage} showInfo={false} />
-                    <div className="topHeading bottumSec">
-                      <h3>{formatDate(propData?.votingStartTime)}</h3>
-                      <h3>{formatDate(propData?.votingEndTime)}</h3>
-                    </div>
+              {propData?.status === "voting" ? (
+                <div className="progressDescription">
+                  <div className="topHeading">
+                    <h3>Progress</h3>
+                    <p>
+                      {calculateTimeRemaining(
+                        new Date(),
+                        propData?.votingEndTime,
+                      )}{" "}
+                      remaining
+                    </p>
                   </div>
-                  : ""
-              }
+                  <Progress percent={progressPercentage} showInfo={false} />
+                  <div className="topHeading bottumSec">
+                    <h3>{formatDate(propData?.votingStartTime)}</h3>
+                    <h3>{formatDate(propData?.votingEndTime)}</h3>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
             </div>
 
             <div className="tabSec">
@@ -330,14 +345,35 @@ function Description() {
         title="Connect Wallet"
         content={
           <>
-            <div className="keplerContent" onClick={connectWallet}>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("keplr")}
+            >
               <img src={keplr} alt="keplr" />
               <div style={{ cursor: "pointer" }}>
-                <h4>keplr</h4>
+                <h4>Keplr</h4>
+              </div>
+            </div>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("cosmostation")}
+            >
+              <img src={cosmostation} alt="cosmostation" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>Cosmostation</h4>
+              </div>
+            </div>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("qubetics")}
+            >
+              <img src={logo} alt="qubetics" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>Qubetics</h4>
               </div>
             </div>
             <p style={{ color: "#fff" }}>
-              Note: If you use keplr Wallet, you will have access to all features
+              Note: If you use a Wallet, you will have access to all features
             </p>
           </>
         }
