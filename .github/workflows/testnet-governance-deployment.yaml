@@ -6,7 +6,7 @@ on:
       - testnet
 
 jobs:
-  deploy_testnet_validator:
+  deploy_governance_portal:
     uses: ./.github/workflows/testnet-governance-service.yaml
     with:
       SWR_ORGANIZATION: testnet-qubetics
@@ -15,8 +15,8 @@ jobs:
       ARGOCD_REPOSITORY: Qubetics/argocd-qubetics
       DEPLOYMENT_PATH: Governance-portal/governance-deployment.yaml
       HUAWEI_IMAGE: governance-portal
-      DOCKER_USERNAME: ap-southeast-3@QHAEGIBURQMR6N4X3NQW
+      DOCKER_USERNAME: ap-southeast-3@HPUAJWWFSLCMD312AZSR
       ENV: ${{ vars.TESTNET_GOVERNANCE_PORTAL_ENV }}
     secrets:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      GIT_SSH_KEY: ${{ secrets.ARGOCD_SSH_KEY }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD_NEW }}
+      GIT_SSH_KEY: ${{ secrets.ARGOCD_SSH_KEY_NEW }}
