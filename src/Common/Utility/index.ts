@@ -131,7 +131,7 @@ export function convertSeconds(seconds: number) {
 export const formatString = (data = "", startLen = 10, endLen = 10) => {
   return `${data.substring(0, startLen)}...${data.substring(
     data?.length - endLen,
-    data?.length
+    data?.length,
   )}`;
 };
 
@@ -150,12 +150,12 @@ export const getBalance = async (address: string) => {
         const balance = data?.data?.balances.find(
           (balance: any) =>
             balance.denom ===
-            (CHAIN_INFO?.stakeCurrency?.coinDenom ?? "").toLowerCase()
+            (CHAIN_INFO?.stakeCurrency?.coinDenom ?? "").toLowerCase(),
         );
         const decimal = CHAIN_INFO.currencies.find(
           (currency) =>
             currency.coinMinimalDenom ===
-            CHAIN_INFO.stakeCurrency?.coinMinimalDenom
+            CHAIN_INFO.stakeCurrency?.coinMinimalDenom,
         )?.coinDecimals;
 
         if (balance) {
@@ -182,24 +182,162 @@ export async function ensureKeplrConnected() {
   const window1: any = window;
 
   if (!window1.keplr) {
+    toast.error("Keplr not installed");
     return { connected: false, reason: "Keplr not installed" };
   }
 
   try {
+    await window1.keplr.enable(CHAIN_INFO.chainId);
     const key = await window1.keplr.getKey(CHAIN_INFO?.chainId ?? "");
-    localStorage.setItem("wltConnected", "true");
     if (key?.bech32Address) {
+      localStorage.setItem("wltConnected", "true");
+      localStorage.setItem("wltType", "keplr");
+      toast.success("Keplr connected successfully!");
       return {
         connected: true,
         address: key.bech32Address,
       };
     }
-  } catch (error) {
-    console.log("Kplr not connected ...... ", error);
+  } catch (error: any) {
+    console.log("Keplr connection error:", error);
+    if (
+      error.message?.includes("There is no chain info") ||
+      error.message?.includes("no chain info")
+    ) {
+      try {
+        await window1.keplr.experimentalSuggestChain(CHAIN_INFO);
+        await window1.keplr.enable(CHAIN_INFO.chainId);
+        const key = await window1.keplr.getKey(CHAIN_INFO.chainId);
+        if (key?.bech32Address) {
+          localStorage.setItem("wltConnected", "true");
+          localStorage.setItem("wltType", "keplr");
+          toast.success("Keplr connected successfully!");
+          return { connected: true, address: key.bech32Address };
+        }
+      } catch (suggestError: any) {
+        console.log("Error suggesting chain to Keplr:", suggestError);
+        toast.error(`Failed to add chain: ${suggestError.message}`);
+        return { connected: false, reason: suggestError.message };
+      }
+    }
+    toast.error(error.message || "Failed to connect to Keplr");
     localStorage.setItem("wltConnected", "false");
+    return { connected: false, reason: error.message };
   }
 
   return { connected: false, reason: "Unknown error" };
+}
+
+export async function ensureCosmostationConnected() {
+  const window1: any = window;
+
+  if (!window1.cosmostation) {
+    toast.error("Cosmostation not installed");
+    return { connected: false, reason: "Cosmostation not installed" };
+  }
+
+  try {
+    // Try Keplr-compatible provider first (best for custom chains)
+    const provider =
+      window1.cosmostation.providers?.keplr || window1.cosmostation.keplr;
+    if (provider) {
+      try {
+        await provider.enable(CHAIN_INFO.chainId);
+        const key = await provider.getKey(CHAIN_INFO.chainId);
+        if (key?.bech32Address) {
+          localStorage.setItem("wltConnected", "true");
+          localStorage.setItem("wltType", "cosmostation");
+          toast.success("Cosmostation connected successfully!");
+          return { connected: true, address: key.bech32Address };
+        }
+      } catch (e: any) {
+        if (
+          e.message?.includes("There is no chain info") ||
+          e.message?.includes("no chain info")
+        ) {
+          await provider.experimentalSuggestChain(CHAIN_INFO);
+          await provider.enable(CHAIN_INFO.chainId);
+          const key = await provider.getKey(CHAIN_INFO.chainId);
+          if (key?.bech32Address) {
+            localStorage.setItem("wltConnected", "true");
+            localStorage.setItem("wltType", "cosmostation");
+            return { connected: true, address: key.bech32Address };
+          }
+        }
+      }
+    }
+
+    // Fallback to native Cosmostation API
+    const account = await window1.cosmostation.cosmos.request({
+      method: "cosmos_requestAccount",
+      params: { chainName: CHAIN_INFO.chainId },
+    });
+
+    if (account?.address) {
+      localStorage.setItem("wltConnected", "true");
+      localStorage.setItem("wltType", "cosmostation");
+      toast.success("Cosmostation connected successfully!");
+      return {
+        connected: true,
+        address: account.address,
+      };
+    }
+  } catch (error: any) {
+    console.log("Cosmostation connect error:", error);
+    toast.error(error.message || "Failed to connect to Cosmostation");
+    localStorage.setItem("wltConnected", "false");
+    return { connected: false, reason: error.message };
+  }
+
+  return { connected: false, reason: "Unable to find account in Cosmostation" };
+}
+
+export async function ensureQubeticsConnected(): Promise<any> {
+  const window1: any = window;
+  if (!window1.qubetics) {
+    toast.error("Install Qubetics Wallet extension");
+    return { connected: false, reason: "Qubetics Wallet not installed" };
+  }
+
+  return new Promise((resolve) => {
+    try {
+      window1.qubetics.sendRequest(
+        "nativeConnect",
+        { nodeUrl: CHAIN_INFO.rpc },
+        (error: any, response: any) => {
+          console.log("Qubetics response: ", response);
+          if (error || response?.type === "error") {
+            const msg =
+              response?.data?.message ||
+              error?.message ||
+              "Something went wrong";
+            toast.error(msg);
+            resolve({ connected: false, reason: msg });
+          } else if (response) {
+            localStorage.setItem("wltConnected", "true");
+            localStorage.setItem("wltType", "qubetics");
+            if (response.data.address) {
+              localStorage.setItem("wltAddress", response.data.address);
+            }
+            if (response.data.evmAddress) {
+              localStorage.setItem("evmAddress", response.data.evmAddress);
+            }
+            toast.success("Logged In Successfully");
+            resolve({
+              connected: true,
+              address: response.data.address,
+              evmAddress: response.data.evmAddress,
+            });
+          } else {
+            resolve({ connected: false, reason: "No response from wallet" });
+          }
+        },
+      );
+    } catch (err: any) {
+      toast.error(err?.message);
+      resolve({ connected: false, reason: err.message });
+    }
+  });
 }
 
 // async function checkKeplrConnection() {
@@ -232,3 +370,23 @@ export async function ensureKeplrConnected() {
 //     return "";
 //   }
 // }
+
+export function getWalletProvider() {
+  const type = localStorage.getItem("wltType");
+  const window1: any = window;
+
+  if (type === "keplr") {
+    return window1.keplr;
+  } else if (type === "cosmostation") {
+    if (window1.cosmostation?.providers?.keplr) {
+      return window1.cosmostation.providers.keplr;
+    }
+    if (window1.cosmostation?.keplr) {
+      return window1.cosmostation.keplr;
+    }
+    return window1.cosmostation;
+  } else if (type === "qubetics") {
+    return window1.qubetics;
+  }
+  return null;
+}

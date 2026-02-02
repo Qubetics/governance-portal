@@ -20,19 +20,19 @@ export const simulateMsgs = async (
     {
       denom: string;
       amount: string;
-    }
+    },
   ],
-  memo: string = ""
+  memo: string = "",
 ) => {
   const account = await fetchAccountInfo(chainInfo, sender);
-
+ 
   if (account) {
     const unsignedTx = TxRaw.encode({
       bodyBytes: TxBody.encode(
         TxBody.fromPartial({
           messages: proto,
           memo,
-        })
+        }),
       ).finish(),
       authInfoBytes: AuthInfo.encode({
         signerInfos: [
@@ -64,18 +64,18 @@ export const simulateMsgs = async (
     }).finish();
 
     const simulatedResult = await httpReqest(
-      `${CHAIN_INFO.rest}/cosmos/tx/v1beta1/simulate`,
+      `${chainInfo.rest}/cosmos/tx/v1beta1/simulate`,
       "POST",
       JSON.stringify({
         tx_bytes: Buffer.from(unsignedTx).toString("base64"),
-      })
+      }),
     );
 
     if (!simulatedResult?.error) {
       const gasUsed = parseInt(simulatedResult?.data?.gas_info.gas_used);
       if (Number.isNaN(gasUsed)) {
         throw new Error(
-          `Invalid integer gas: ${simulatedResult?.data?.gas_info.gas_used}`
+          `Invalid integer gas: ${simulatedResult?.data?.gas_info.gas_used}`,
         );
       }
 

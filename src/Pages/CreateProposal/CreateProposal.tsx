@@ -3,6 +3,7 @@ import "./CreateProposal.scss";
 import toast from "react-hot-toast";
 import { useContext, useState } from "react";
 import keplr from "../../Common/assets/keplr.svg";
+import cosmostation from "../../Common/assets/cosmostation.svg";
 import { UserContext } from "../../Context/store";
 import CreateProposalCard from "./CreateProposalCard";
 import { sendMsgs } from "../../Common/Utility/sendMsgs";
@@ -14,12 +15,15 @@ import { simulateMsgs } from "../../Common/Utility/simulateMsgs";
 import { TextProposal } from "cosmjs-types/cosmos/gov/v1beta1/gov";
 import { MsgSubmitProposal } from "cosmjs-types/cosmos/gov/v1beta1/tx";
 import { CopyIcon } from "../../Common/assets/StoreAsset/StoreAsset";
-import logo from "../../logo.svg"
+import logo from "../../logo.svg";
 import {
   convertSeconds,
   copyToClipBoard,
+  ensureCosmostationConnected,
   ensureKeplrConnected,
+  ensureQubeticsConnected,
   getBalance,
+  getWalletProvider,
   noExponent,
 } from "../../Common/Utility";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +48,8 @@ function CreateProposal() {
     walletAddress,
     setWalletAddress,
     setIsWallet,
+    setWalletType,
+    setEvmAddress,
     // setWalletBalance,
     votingWidgetsData,
   } = useContext(UserContext);
@@ -113,7 +119,7 @@ function CreateProposal() {
       error = true;
     } else if (+propData?.deposit < minimumDeposite) {
       msg.deposit = `Minimum deposit amount is ${noExponent(
-        minimumDeposite
+        minimumDeposite,
       )}. Please enter a higher amount.`;
       error = true;
     }
@@ -135,16 +141,16 @@ function CreateProposal() {
         toast.error("Please connect to wallet!");
         return;
       }
-      const balance = await getBalance(walletAddress)
+      const balance = await getBalance(walletAddress);
       if (+propData?.deposit > Number(balance ?? 0)) {
         toast.error("Insufficient funds");
         return;
       }
 
       if (!inputValidation()) {
-        setBtnDisabled(true)
-        const win: any = window;
-        const key = await win.keplr.getKey(CHAIN_INFO.chainId);
+        setBtnDisabled(true);
+        const provider = getWalletProvider();
+        const key = await provider.getKey(CHAIN_INFO.chainId);
         const title = propData?.title.trim();
         const description = propData?.description.trim();
 
@@ -179,17 +185,25 @@ function CreateProposal() {
               denom: CONST.currency.toLowerCase(),
               amount: "100000000",
             },
-          ]
+          ],
         );
 
         if (gasFeeRes?.error) {
-          if (typeof gasFeeRes?.data === "string" && gasFeeRes?.data.includes("unrecognized/unsupported public key type")) {
-            throw new Error("You’ll need to register yourself on the " + CONST.chainName + " network first.")
+          if (
+            typeof gasFeeRes?.data === "string" &&
+            gasFeeRes?.data.includes("unrecognized/unsupported public key type")
+          ) {
+            throw new Error(
+              "You’ll need to register yourself on the " +
+                CONST.chainName +
+                " network first.",
+            );
           } else {
-            throw new Error("Something went wrong!")
+            throw new Error("Something went wrong!");
           }
         } else {
-          await sendMsgs(win.keplr, CHAIN_INFO, key.bech32Address, [sendMsg], {
+          const provider = getWalletProvider();
+          await sendMsgs(provider, CHAIN_INFO, key.bech32Address, [sendMsg], {
             amount: [
               {
                 denom: CONST.currency.toLowerCase(),
@@ -199,7 +213,7 @@ function CreateProposal() {
             gas: Math.floor(Number(gasFeeRes?.gasUsed ?? 0) * 1.5).toString(),
           });
           toast.success("Proposal created successfully");
-          navigate("/")
+          navigate("/");
           setPropData({
             title: "",
             description: "",
@@ -207,7 +221,6 @@ function CreateProposal() {
           });
         }
       }
-
     } catch (error: any) {
       toast.error(error?.message ?? "Something went wrong!");
       console.log("error while creating proposal : ", error);
@@ -220,14 +233,26 @@ function CreateProposal() {
     setkeplrModalOpen(!keplrModalOpen);
   };
 
-  async function connectWallet() {
-    const data = await ensureKeplrConnected();
+  async function connectWallet(type: string) {
+    let data;
+    if (type === "keplr") {
+      data = await ensureKeplrConnected();
+    } else if (type === "cosmostation") {
+      data = await ensureCosmostationConnected();
+    } else {
+      data = await ensureQubeticsConnected();
+    }
 
-    if (data?.address) {
+    if (data?.connected && data?.address) {
       setIsWallet(true);
       setWalletAddress(data?.address);
+      setWalletType(type);
+      if (data?.evmAddress) {
+        setEvmAddress(data.evmAddress);
+      }
       localStorage.setItem("wltConnected", "true");
       localStorage.setItem("wltAddress", data?.address);
+      localStorage.setItem("wltType", type);
     }
     handleKeplrModal();
   }
@@ -235,50 +260,55 @@ function CreateProposal() {
   const data = [
     {
       action: "Min Deposit",
-      days: `${noExponent(
-        votingWidgetsData?.params?.min_deposit[0]?.amount
-          ? votingWidgetsData?.params?.min_deposit[0]?.amount / 10 ** 18
-          : 0
-      ) ?? "-"
-        } ${CONST.currency}`,
+      days: `${
+        noExponent(
+          votingWidgetsData?.params?.min_deposit[0]?.amount
+            ? votingWidgetsData?.params?.min_deposit[0]?.amount / 10 ** 18
+            : 0,
+        ) ?? "-"
+      } ${CONST.currency}`,
     },
     {
       action: "Max Deposit Period",
-      days: `${convertSeconds(
-        votingWidgetsData?.params?.max_deposit_period
-          ? votingWidgetsData?.params?.max_deposit_period.split("s")[0]
-          : 0
-      ) ?? 0
-        }`,
+      days: `${
+        convertSeconds(
+          votingWidgetsData?.params?.max_deposit_period
+            ? votingWidgetsData?.params?.max_deposit_period.split("s")[0]
+            : 0,
+        ) ?? 0
+      }`,
     },
     {
       action: "Voting Period",
       days: `${convertSeconds(
         votingWidgetsData?.voting_params?.voting_period
           ? votingWidgetsData?.voting_params?.voting_period.split("s")[0]
-          : 0
+          : 0,
       )}`,
     },
     {
       action: "Quorum",
-      days: `${votingWidgetsData?.params?.quorum
-        ? votingWidgetsData?.params?.quorum * 100
-        : 0
-        }%`,
+      days: `${
+        votingWidgetsData?.params?.quorum
+          ? votingWidgetsData?.params?.quorum * 100
+          : 0
+      }%`,
     },
     {
       action: "Threshold",
-      days: `${votingWidgetsData?.params?.threshold
-        ? votingWidgetsData?.params?.threshold * 100
-        : 0
-        }%`,
+      days: `${
+        votingWidgetsData?.params?.threshold
+          ? votingWidgetsData?.params?.threshold * 100
+          : 0
+      }%`,
     },
     {
       action: "Veto Threshold",
-      days: `${votingWidgetsData?.params?.veto_threshold
-        ? votingWidgetsData?.params?.veto_threshold * 100
-        : 0
-        }%`,
+      days: `${
+        votingWidgetsData?.params?.veto_threshold
+          ? votingWidgetsData?.params?.veto_threshold * 100
+          : 0
+      }%`,
     },
   ];
 
@@ -391,7 +421,11 @@ function CreateProposal() {
               <CreateProposalCard data={data} />
               <div className="createProposalMultiBtn">
                 {/* <button className="commonBtn">Preview</button> */}
-                <button disabled={btnDisabled} className="commonBtn" onClick={handleCreateProposal}>
+                <button
+                  disabled={btnDisabled}
+                  className="commonBtn"
+                  onClick={handleCreateProposal}
+                >
                   Create Proposal
                 </button>
               </div>
@@ -405,14 +439,35 @@ function CreateProposal() {
         title="Connect Wallet"
         content={
           <>
-            <div className="keplerContent" onClick={connectWallet}>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("keplr")}
+            >
               <img src={keplr} alt="keplr" />
               <div style={{ cursor: "pointer" }}>
-                <h4>keplr</h4>
+                <h4>Keplr</h4>
+              </div>
+            </div>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("cosmostation")}
+            >
+              <img src={cosmostation} alt="cosmostation" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>Cosmostation</h4>
+              </div>
+            </div>
+            <div
+              className="keplerContent"
+              onClick={() => connectWallet("qubetics")}
+            >
+              <img src={logo} alt="qubetics" />
+              <div style={{ cursor: "pointer" }}>
+                <h4>Qubetics</h4>
               </div>
             </div>
             <p style={{ color: "#fff", fontSize: "large" }}>
-              Note: If you use Keplr Wallet, you will have access to all features
+              Note: If you use a Wallet, you will have access to all features
             </p>
           </>
         }
