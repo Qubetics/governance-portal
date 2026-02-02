@@ -316,8 +316,8 @@ export async function ensureQubeticsConnected(): Promise<any> {
           } else if (response) {
             localStorage.setItem("wltConnected", "true");
             localStorage.setItem("wltType", "qubetics");
-            if (response.data.address) {
-              localStorage.setItem("wltAddress", response.data.address);
+            if (response.data.valoperAddress) {
+              localStorage.setItem("wltAddress", response.data.valoperAddress);
             }
             if (response.data.evmAddress) {
               localStorage.setItem("evmAddress", response.data.evmAddress);
@@ -325,7 +325,7 @@ export async function ensureQubeticsConnected(): Promise<any> {
             toast.success("Logged In Successfully");
             resolve({
               connected: true,
-              address: response.data.address,
+              address: response.data.valoperAddress,
               evmAddress: response.data.evmAddress,
             });
           } else {
